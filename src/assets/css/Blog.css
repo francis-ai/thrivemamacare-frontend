@@ -1,0 +1,106 @@
+.Blog-container {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+.Blog-container .hero-section {
+  position: relative;
+  background: linear-gradient(to right, #000000, #000000);
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+.Blog-container .hero-title {
+    font-size: 3rem;
+    z-index: 2;
+    position: relative;
+}
+.Blog-container .animated-blob-1 {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+.Blog-container .animated-blob-2 {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+@keyframes blob-move {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+    50% {
+      transform: scale(1.05) translate(20px, -10px);
+    }
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+}
+/* Blog Cards */
+.blog-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+  border-radius: 12px;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.blog-card img {
+  height: 220px;
+  object-fit: cover;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.blog-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.blog-card .card-text {
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* Button Customization */
+.btn-outline {
+  border-radius: 30px;
+  color: #648E87;;
+  border-color: #648E87;;
+}
+
+.btn-outline:hover {
+  background: #648E87;;
+  color: #fff;
+}
+
+/* Pagination Button */
+.btn-outline-secondary {
+  border-radius: 20px;
+  padding: 8px 24px;
+}
+
+/* Responsive Fixes */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+}
+

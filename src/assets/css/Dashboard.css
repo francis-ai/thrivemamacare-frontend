@@ -1,0 +1,20 @@
+.Dashboard-container {
+  margin-top: 90px;
+}
+a{
+  color:black;
+}
+.primary {
+  color:#648E87; 
+}
+.request-btn{
+  background-color:#648E87;
+}
+.support-btn {
+  border: 1px solid #648E87; 
+  color:#648E87;
+}
+@media (max-width: 768px) {
+  
+}
+  

@@ -1,0 +1,86 @@
+.cta-section {
+    background-color: #fefefe;
+    padding: 60px 20px;
+    border-top: 1px solid #eee;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .cta-section .container {
+    background-color: #000000ec; 
+    width:80%;
+    padding: 60px;
+    justify-content:end;
+  }
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }  
+  .cta-buttons .btn {
+    background-color: #648E87; 
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1rem;
+    margin: 0 10px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 0;
+    transition: background 0.3s ease;
+  }
+  .cta-buttons .btn-left {
+    background:#fff;
+    border:1px solid #dd700a;
+    color:#dd700a;
+  }
+  .cta-buttons .btn-right {
+    border:1px solid #648E87; 
+  }
+  .cta-buttons .btn-right:hover {
+    background: #597f79; 
+  }
+  .cta-buttons .btn-left:hover {
+    background: #dd700a;
+    color:#fff;
+  }
+  .cta-title {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 20px;
+    font-weight:400;
+  }
+ .cta-buttons .btn-primary  {
+    background-color: #648E87;
+    border: none;
+    border-radius: 0px;
+  }
+  
+  .cta-buttons .btn-outline-secondary {
+    border-color: #FF7F0E;
+    color: #FF7F0E;
+    border-radius: 0px;
+  }
+  
+  .cta-buttons .btn-outline-secondary:hover {
+    background-color: #FF7F0E;
+    color: #fff;
+  }
+  @media (max-width: 768px){
+    .cta-section {
+        padding:0;
+        margin:0;
+    }
+    .cta-section .container{
+        width:100%;
+        margin:0;
+    }
+    .cta-buttons .btn-left {
+        width: 90%;
+    }
+    .cta-buttons .btn-right{
+        width: 90%;
+        margin:0px;
+    }
+  }

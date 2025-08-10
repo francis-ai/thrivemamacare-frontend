@@ -1,0 +1,47 @@
+.focused-on-safety-container {
+    position: relative;
+    padding: 50px 0;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .safety-scroll-container {
+    overflow: hidden; 
+    position: relative;
+  }
+  
+  .safety-icons-container {
+    display: flex;
+    justify-content:center;
+  }
+  
+  .safety-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin:10px 40px; /* Space between icons */
+  }
+  
+  .safety-icon {
+    margin-bottom: 10px;
+  }
+  
+  .safety-title {
+    text-align: center;
+    font-size: 17px;
+  }
+  
+  /* Animation to scroll the container */
+  @keyframes scroll-left {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  @media (max-width: 768px){
+    .safety-icons-container {
+        animation: scroll-left 8s linear infinite;
+    }
+  }
+  

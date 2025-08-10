@@ -1,0 +1,119 @@
+.About-container {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+.About-container .hero-section {
+  position: relative;
+  background: linear-gradient(to right, #000000, #000000);
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+.About-container .hero-title {
+    font-size: 3rem;
+    z-index: 2;
+    position: relative;
+}
+.About-container .animated-blob-1 {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+.About-container .animated-blob-2 {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+@keyframes blob-move {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+    50% {
+      transform: scale(1.05) translate(20px, -10px);
+    }
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+}
+
+.about-us {
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #000;
+}
+
+.main-heading {
+    font-size: 2.5rem;
+    font-weight:300;
+    color: #dd700a;
+    margin-bottom: 20px;
+}
+.value-card {
+  background-color: #f9f9f9;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+}
+.waiting-list-btn {
+    background-color:#648E87;
+    border-radius:0px;
+    padding:10px 30px;
+    color:#fff;
+}
+.waiting-list-btn:hover {
+     background-color:#486c66;
+} 
+.value-icon {
+    color:#648E87;
+}
+.founder-image {
+  max-width: 100%;
+  width: 400px; /* or adjust as needed */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+@keyframes blob-move {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+    50% {
+      transform: scale(1.05) translate(20px, -10px);
+    }
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+}
+@media(max-width:768px) {
+    .section-title{
+        font-size:1.5rem;
+    }
+    .main-heading{
+        font-size:1.5rem;
+    }
+}

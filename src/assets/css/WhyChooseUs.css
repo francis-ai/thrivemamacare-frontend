@@ -1,0 +1,77 @@
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .why-choose-section {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .why-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 30px;
+  }
+  
+  .why-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 0px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    height: 200px;
+  }
+  
+  .why-card-border-1 {
+    border-bottom: 4px solid #0E3B31; /* Green color */
+  }
+  
+  .why-card-border-2 {
+    border-bottom: 4px solid #ff7a2b; /* Orange color */
+  }
+  
+  .why-card h3 {
+    font-size: 1.6rem;
+    color: #333;
+    margin: 15px 0;
+  }
+  
+  .why-card p {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .swiper-nav-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .swiper-button-prev,
+  .swiper-button-next {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 20px 10px 0;
+    color: #648e87;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .swiper-button-prev::after,
+  .swiper-button-next::after {
+    font-size: 24px;
+  }
+  
+  /* Hover effects */
+  .swiper-button-prev:hover,
+  .swiper-button-next:hover {
+    color: #ff7a2b;
+  }
+  

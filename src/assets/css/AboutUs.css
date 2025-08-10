@@ -1,0 +1,68 @@
+.about-us-section {
+    background: #fff;
+    color: #333;
+    padding: 60px 80px;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .image-stack {
+    position: relative;
+  }
+  
+  .img-top, .img-bottom {
+    width: 80%;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .img-top {
+    margin-bottom: 20px;
+  }
+  
+  .img-bottom {
+    margin-top: 20px;
+  }
+  a{
+    text-decoration:none;
+  }
+  .text-section .small-label {
+    font-size: 0.9rem;
+    color: #dd700a;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+  
+  .text-section .main-heading {
+    font-size: 3rem;
+    font-weight:300;
+    color: #0E3B31;
+    margin-bottom: 20px;
+  }
+  
+  .text-section .description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+  }
+  
+  .about-btn {
+    background-color: #dd700a;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 0px;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+  }
+  
+  .about-btn:hover {
+    background-color: #e66d00;
+  }
+
+  
+@media (max-width: 768px) {
+    .about-us-section {
+        padding: 30px 0;
+    }
+}

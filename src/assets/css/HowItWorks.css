@@ -1,0 +1,143 @@
+.background-animation-wrapper {
+    position: relative;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(135deg, #f7f7f7, #ffffff);
+    overflow: hidden;
+    padding-bottom:2rem;
+  }
+  
+  /* SVG container */
+  .background-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* behind content */
+  }
+  
+  .animated-lines {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+  
+  .line {
+    fill: none;
+    stroke: #70AD5E;
+    stroke-width: 1;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: drawLine 10s ease-in-out infinite;
+  }
+  
+  .line2 {
+    fill: none;
+    stroke: #b57215;
+    stroke-width: 1;
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: drawLine 10s ease-in-out infinite;
+    animation-delay: 5s;
+  }
+  
+  /* Animation keyframes */
+  @keyframes drawLine {
+    0% {
+      stroke-dashoffset: 200;
+      transform: translateX(-5%);
+    }
+    50% {
+      stroke-dashoffset: 0;
+      transform: translateX(5%);
+    }
+    100% {
+      stroke-dashoffset: 200;
+      transform: translateX(-5%);
+    }
+  }
+  
+  .content-overlay {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 1rem;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .steps-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+    position: relative;
+    margin-top: 2rem;
+  }
+  
+  /* Dotted line connector */
+  .steps-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 4px;
+    background-image: linear-gradient(to right, #111010 33%, rgba(255, 255, 255, 0) 0%);
+    background-position: top;
+    background-size: 10px 2px;
+    background-repeat: repeat-x;
+    z-index: 0;
+  }
+  
+  .step-box {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 60%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    height:220px;
+    min-width: 260px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  
+  .step-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0E3B31;
+    margin-bottom: 0.5rem;
+  }
+  
+  .step-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .step-description {
+    font-size: 0.95rem;
+    color: #666;
+  }
+  
+  /* Mobile: stack vertically, hide the line */
+  @media (max-width: 768px) {
+    .steps-container {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .steps-container::before {
+      display: none;
+    }
+  
+    .step-box {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+  }
+  

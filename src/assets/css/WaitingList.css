@@ -1,0 +1,65 @@
+.WaitingList-container {
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+.WaitingList-container .hero-section {
+  position: relative;
+  background: linear-gradient(to right, #000000, #000000);
+  padding: 160px 0 60px;
+  text-align: center;
+  overflow: hidden;
+}
+.WaitingList-container .hero-title {
+    font-size: 3rem;
+    z-index: 2;
+    position: relative;
+}
+.WaitingList-container .animated-blob-1 {
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+.WaitingList-container .animated-blob-2 {
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    width: 200px;
+    height: 200px;
+    z-index: 0;
+    background: radial-gradient(circle at center, #a05a0ab2 30%, transparent 70%);
+    animation: blob-move 20s infinite ease-in-out;
+    border-radius: 50%;
+    filter: blur(70px);
+}
+@keyframes blob-move {
+    0% {
+      transform: scale(1) translate(0, 0);
+    }
+    50% {
+      transform: scale(1.05) translate(20px, -10px);
+    }
+    100% {
+      transform: scale(1) translate(0, 0);
+    }
+}
+.form-input{
+    padding:10px;
+    border:1px solid #648E87;
+    border-radius:0px;
+}
+.waiting-list-submit-btn {
+    background-color:#648E87;
+    padding:10px;
+    border:#648E87;
+    border-radius:0px;
+}
+.waiting-list-submit-btn:hover{
+    background-color:#45635e;
+}
