@@ -52,7 +52,7 @@ const Footer = () => {
           <h3>Find Jobs</h3>
           <ul>
             <li>Nanny Jobs</li>
-            <li>Hourse Help Jobs</li>
+            <li>House Help Jobs</li>
             <li>Part-time Opportunities</li>
             <li>Live-in Roles</li>
           </ul>

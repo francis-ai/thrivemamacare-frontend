@@ -35,6 +35,7 @@ const menuItems = [
   { text: 'Messages', icon: <Mail />, path: 'messages' },
   { text: 'Notifications', icon: <Notifications />, path: 'notifications' },
   { text: 'Support Tickets', icon: <Help />, path: 'support' },
+  { text: 'Vacancies', icon: <Help />, path: 'vacancy' },
   { text: 'Subscription Plans', icon: <Help />, path: 'subscription' },
   { text: 'Lagal & Info', icon: <Settings />, path: 'legal-info'},
   { text: 'Settings', icon: <Settings />, path: 'settings' },

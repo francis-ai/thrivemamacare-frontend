@@ -13,6 +13,7 @@ import Support from './pages/Support';
 import LegalInfo from './pages/LegalInfo';
 import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
+import Vacancy from './pages/Vacancy';
 import Login from './pages/Login';
 
 const AdminApp = () => {
@@ -37,6 +38,7 @@ const AdminApp = () => {
           <Route path="support" element={<Support />} />
           <Route path="legal-info" element={<LegalInfo />} />
           <Route path="subscription" element={<Subscription />} />
+          <Route path="vacancy" element={<Vacancy />} />
           <Route path="settings" element={<Settings />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>

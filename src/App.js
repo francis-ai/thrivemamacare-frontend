@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Hero from './components/Hero';
+import Vacancy from './components/Vacancy';
 import FocusedOnSafety from './components/FocusedOnsafety';
 import WhyChooseUs from './components/WhyChooseUs';
 import Testimonials from './components/Testimonials';
@@ -62,6 +63,7 @@ function Home() {
     <>
       <Hero />
       <WhyChooseUs />
+      <Vacancy />
       <AboutUs />
       <HowItWorks />
       <FocusedOnSafety />

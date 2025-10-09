@@ -11,10 +11,16 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("👉 BASE_URL:", BASE_URL);
+    console.log("👉 Email entered:", email);
+
     try {
       const res = await axios.post(`${BASE_URL}/api/auth/forgot-password`, { email });
+      console.log("✅ Backend response:", res.data);
+
       setMessage({ type: 'success', text: res.data.message });
     } catch (err) {
+      console.error("❌ Request failed:", err.response?.data || err.message);
       setMessage({ type: 'error', text: err.response?.data?.message || 'Request failed.' });
     }
   };

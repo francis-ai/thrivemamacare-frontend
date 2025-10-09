@@ -11,7 +11,10 @@ import {
   Radio,
   FormLabel,
   Alert,
+  IconButton,
+  InputAdornment
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,7 +31,8 @@ const Register = () => {
   });
 
   const [message, setMessage] = useState({ type: '', text: '' });
-  const navigate = useNavigate(); // 👈 Add this
+  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,11 +52,9 @@ const Register = () => {
         password: '',
       });
 
-      // 👇 Redirect after 2 seconds
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-
     } catch (err) {
       setMessage({
         type: 'error',
@@ -155,12 +157,24 @@ const Register = () => {
             <TextField
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               value={form.password}
               onChange={handleChange}
               fullWidth
               margin="normal"
-              InputProps={{ sx: { borderRadius: 0 } }}
+              InputProps={{
+                sx: { borderRadius: 0 },
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
 
             <Button
@@ -182,9 +196,7 @@ const Register = () => {
               Register
             </Button>
           </Box>
-          <Typography 
-            variant="body2"
-            sx={{ mt: 2}}>
+          <Typography variant="body2" sx={{ mt: 2 }}>
             Already have an account?
             <Box
               component="span"

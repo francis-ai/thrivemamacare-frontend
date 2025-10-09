@@ -58,8 +58,8 @@ const Hero = () => {
             {banners.tagline}
           </p>
           <div className="hero-buttons">
-            <Link to="/register" className="btn btn-left mb-2">Get Started</Link>
-            <Link to="/about" className="btn btn-right mb-2">Learn More</Link>
+            <Link to="/register" className="btn btn-left mb-2">Find Help & Caregiver</Link>
+            <Link to="/about" className="btn btn-right mb-2">Become a Helper or Caregiver</Link>
           </div>
         </motion.div>
 

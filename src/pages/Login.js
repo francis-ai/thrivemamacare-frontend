@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
   Grid, Box, Typography, TextField, Button, Alert, Paper,
+  IconButton, InputAdornment
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // adjust path as needed
@@ -12,6 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
   const { login } = useAuth(); // get login from context
 
   const handleChange = (e) => {
@@ -45,7 +48,6 @@ const Login = () => {
     }
   };
 
-
   return (
     <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: '100vh', backgroundColor: '#f4f6f8' }}>
       <Grid item xs={12} md={6} lg={5}>
@@ -66,14 +68,28 @@ const Login = () => {
                 fullWidth
                 margin="normal"
               />
+
+              {/* Password Field with toggle */}
               <TextField
                 label="Password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={form.password}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
 
               <Typography
@@ -83,10 +99,12 @@ const Login = () => {
               >
                 Forgot Password?
               </Typography>
+
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, backgroundColor: '#648E87' }}>
                 Login
               </Button>
             </form>
+
             <Typography 
               variant="body2"
               sx={{ mt: 2}}>
