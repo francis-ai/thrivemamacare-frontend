@@ -33,10 +33,10 @@ const Sidebar = () => {
 
   const navItems = [
     { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
-    { text: 'Request a Helper', icon: <People />, path: '/dashboard/request' },
-    { text: 'My Requests', icon: <ListAlt />, path: '/dashboard/my-requests' },
-    { text: 'Interested Helper', icon: <ListAlt />, path: '/dashboard/interest-caregiver' },
-    { text: 'Approved Helper', icon: <ListAlt />, path: '/dashboard/approved-caregiver' },
+    { text: 'Post Job', icon: <People />, path: '/dashboard/create-job' },
+    { text: 'My Jobs', icon: <ListAlt />, path: '/dashboard/my-jobs' },
+    { text: 'Applications', icon: <ListAlt />, path: '/dashboard/application' },
+    // { text: 'Approved Helper', icon: <ListAlt />, path: '/dashboard/approved-caregiver' },
     { text: 'Review', icon: <Chat />, path: '/dashboard/review' },
     { text: 'My Account', icon: <AccountCircle />, path: '/dashboard/account' },
     { text: 'Support', icon: <SupportAgent />, path: '/dashboard/support' },

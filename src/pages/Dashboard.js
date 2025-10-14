@@ -52,7 +52,7 @@ const Dashboard = () => {
           variant="contained"
           className="request-btn"
           sx={{ mt: 2, mb: 4, backgroundColor: '#648E87' }}
-          href="/dashboard/request"
+          href="/dashboard/create-job"
         >
           Request a Helper
         </Button>

@@ -39,6 +39,10 @@ import RequestStep2 from './pages/Dashboard/RequestStep2';
 import RequestStep3 from './pages/Dashboard/RequestStep3';
 import RequestStep4 from './pages/Dashboard/RequestStep4';
 import RequestStep5 from './pages/Dashboard/RequestStep5';
+
+import CreateJob from './pages/Dashboard/CreateJob';
+import MyJobs from './pages/Dashboard/MyJobs';
+import Application from './pages/Dashboard/Applications';
 // Caregiver Dashboard
 import CaregiverDashboard from './pages/Caregiver/Dashboard';
 import AvailableRequest from './pages/Caregiver/AvailableRequest';
@@ -53,6 +57,10 @@ import Notifications from './pages/Caregiver/Notifications';
 import Earnings from './pages/Caregiver/Earnings';
 import Schedule from './pages/Caregiver/Schedule';
 import CaregiverSupport from './pages/Caregiver/Support';
+
+import Jobs from './pages/Caregiver/Jobs';
+import JobDetails from './pages/Caregiver/JobDetails';
+import MyApplications from './pages/Caregiver/MyApplication';
 // Admin Dashboard (Excluded from AuthProvider)
 import AdminApp from './admin/AdminApp';
 // Context
@@ -117,6 +125,10 @@ function App() {
                   <Route path="request-step3" element={<RequestStep3 />} />
                   <Route path="request-step4" element={<RequestStep4 />} />
                   <Route path="request-step5" element={<RequestStep5 />} />
+
+                  <Route path="create-job" element={<CreateJob />} />
+                  <Route path="my-jobs" element={<MyJobs />} />
+                  <Route path="application" element={<Application />} />
                 </Route>
 
                 {/* Caregiver Dashboard Section */}
@@ -133,6 +145,10 @@ function App() {
                 <Route path="/caregiver/earnings" element={<Earnings />} />
                 <Route path="/caregiver/schedule" element={<Schedule />} />
                 <Route path="/caregiver/support" element={<CaregiverSupport />} />
+                
+                <Route path="/caregiver/jobs" element={<Jobs />} />
+                <Route path="/caregiver/jobs/:id" element={<JobDetails />} />
+                <Route path="/caregiver/my-applications" element={<MyApplications />} />
               </Routes>
             </AuthProvider>
           }

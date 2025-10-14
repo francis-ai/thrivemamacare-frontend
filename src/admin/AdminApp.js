@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Subscription from './pages/Subscription';
 import Vacancy from './pages/Vacancy';
 import Login from './pages/Login';
+import AllJobs from './pages/Jobs';
 
 const AdminApp = () => {
   const token = localStorage.getItem('adminToken');
@@ -40,6 +41,7 @@ const AdminApp = () => {
           <Route path="subscription" element={<Subscription />} />
           <Route path="vacancy" element={<Vacancy />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="all-jobs" element={<AllJobs />} />
           <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
       ) : (
