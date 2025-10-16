@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Grid, Box, Typography, TextField, Button, Alert, Paper,
-  IconButton, InputAdornment
+  IconButton, InputAdornment, CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
@@ -14,8 +14,9 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState({ text: '', type: '' });
-  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
-  const { login } = useAuth(); // get login from context
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ loading state
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -24,27 +25,39 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage({ text: '', type: '' });
+    setLoading(true);
 
     try {
       const res = await axios.post(`${BASE_URL}/api/auth/login`, form);
       const user = res.data.user;
 
       if (!user || !user.type) {
-        return setMessage({ text: 'Invalid login response.', type: 'error' });
+        setMessage({ text: 'Invalid login response.', type: 'error' });
+        setLoading(false);
+        return;
       }
 
-      login(user, user.type); // ✅ update AuthContext state
+      login(user, user.type);
+      setMessage({
+        text: 'Login successful! Redirecting...',
+        type: 'success',
+      });
 
-      if (user.type === 'caregiver') {
-        navigate('/caregiver/dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      // Delay navigation slightly so success message shows
+      setTimeout(() => {
+        if (user.type === 'caregiver') {
+          navigate('/caregiver/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 1500);
     } catch (err) {
       setMessage({
         text: err.response?.data?.message || 'Login failed.',
         type: 'error',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,11 +66,23 @@ const Login = () => {
       <Grid item xs={12} md={6} lg={5}>
         <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
           <Box>
-            <Typography variant="h4" fontWeight="bold" mb={3} color="#648E87">
+            <Typography variant="h4" fontWeight="bold" mb={3} color="#648E87" textAlign="center">
               Welcome Back
             </Typography>
 
-            {message.text && <Alert severity={message.type} sx={{ mb: 2 }}>{message.text}</Alert>}
+            {message.text && (
+              <Alert
+                severity={message.type}
+                sx={{
+                  mb: 2,
+                  fontSize: message.type === 'success' ? '1.2rem' : '1rem',
+                  textAlign: 'center',
+                  py: message.type === 'success' ? 2 : 1,
+                }}
+              >
+                {message.text}
+              </Alert>
+            )}
 
             <form noValidate onSubmit={handleSubmit}>
               <TextField
@@ -69,7 +94,6 @@ const Login = () => {
                 margin="normal"
               />
 
-              {/* Password Field with toggle */}
               <TextField
                 label="Password"
                 name="password"
@@ -81,10 +105,7 @@ const Login = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
@@ -100,21 +121,31 @@ const Login = () => {
                 Forgot Password?
               </Typography>
 
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, backgroundColor: '#648E87' }}>
-                Login
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  backgroundColor: '#648E87',
+                  height: 45,
+                  fontSize: '1rem',
+                  fontWeight: 'bold'
+                }}
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={26} sx={{ color: 'white' }} /> : 'Login'}
               </Button>
             </form>
 
-            <Typography 
-              variant="body2"
-              sx={{ mt: 2}}>
-              Don't have an account yet?
+            <Typography variant="body2" sx={{ mt: 2, textAlign: 'center' }}>
+              Don’t have an account yet?{' '}
               <Box
                 component="span"
-                sx={{ color: '#648E87', cursor: 'pointer' }}
+                sx={{ color: '#648E87', cursor: 'pointer', fontWeight: 'bold' }}
                 onClick={() => navigate('/register')}
               >
-                 Register
+                Register
               </Box>
             </Typography>
           </Box>

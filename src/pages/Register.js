@@ -12,7 +12,8 @@ import {
   FormLabel,
   Alert,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  CircularProgress
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
@@ -31,7 +32,8 @@ const Register = () => {
   });
 
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [showPassword, setShowPassword] = useState(false); // 👈 toggle state
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false); // 👈 loading state
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -40,6 +42,7 @@ const Register = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // start loading
     try {
       const res = await axios.post(`${BASE_URL}/api/auth/register`, form);
       setMessage({ type: 'success', text: res.data.message });
@@ -60,6 +63,8 @@ const Register = () => {
         type: 'error',
         text: err.response?.data?.message || 'Something went wrong',
       });
+    } finally {
+      setLoading(false); // stop loading
     }
   };
 
@@ -91,10 +96,21 @@ const Register = () => {
           </Typography>
 
           {message.text && (
-            <Alert severity={message.type} sx={{ mb: 2 }}>
+            <Alert
+              severity={message.type} // 'success' or 'error'
+              sx={{
+                mb: 3,
+                textAlign: 'center',
+                fontSize: message.type === 'success' ? '1.8rem' : '1rem', // bigger for success
+                fontWeight: message.type === 'success' ? 'bold' : 'normal',
+                py: message.type === 'success' ? 2 : 1, // more padding for success
+                borderRadius: 2,
+              }}
+            >
               {message.text}
             </Alert>
           )}
+
 
           <Box component="form" noValidate autoComplete="off">
             <TextField
@@ -181,6 +197,7 @@ const Register = () => {
               fullWidth
               variant="contained"
               onClick={handleSubmit}
+              disabled={loading} // disable during loading
               sx={{
                 mt: 3,
                 py: 1.5,
@@ -191,16 +208,20 @@ const Register = () => {
                   backgroundColor: '#4b6e68',
                 },
                 textTransform: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              Register
+              {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Register'}
             </Button>
           </Box>
+
           <Typography variant="body2" sx={{ mt: 2 }}>
             Already have an account?
             <Box
               component="span"
-              sx={{ color: '#648E87', cursor: 'pointer' }}
+              sx={{ color: '#648E87', cursor: 'pointer', ml: 1 }}
               onClick={() => navigate('/login')}
             >
               Login

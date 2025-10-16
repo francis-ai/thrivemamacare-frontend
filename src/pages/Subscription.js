@@ -25,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import '../assets/css/Subscription.css';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const PAYSTACK = process.env.PAYSTACK_PUBLIC_KEY || "pk_live_c5aeddafb04016980cb65613a8647f5ead7e8d4d";
 
 export default function Subscription() {
   const theme = useTheme();
@@ -84,7 +85,7 @@ export default function Subscription() {
 
   const initializePayment = (plan) => {
     const handler = window.PaystackPop.setup({
-      key: 'pk_test_5624a1b37a80ce2f38d7d2da8e5d02a2a405d8de',
+      key: PAYSTACK,
       email: user.email,
       amount: Number(plan.price) * 100,
       currency: 'NGN',

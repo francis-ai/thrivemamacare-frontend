@@ -22,6 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const PAYSTACK = process.env.PAYSTACK_PUBLIC_KEY || "pk_live_c5aeddafb04016980cb65613a8647f5ead7e8d4d";
 
 const ApprovedCaregiver = () => {
   const { user } = useAuthUser();
@@ -133,7 +134,7 @@ const ApprovedCaregiver = () => {
       const amountInKobo = Math.round(currentAmount * 100);
 
       const paymentHandler = window.PaystackPop.setup({
-        key: 'pk_test_5624a1b37a80ce2f38d7d2da8e5d02a2a405d8de',
+        key: PAYSTACK,
         email: user.email,
         amount: amountInKobo,
         currency: 'NGN',
