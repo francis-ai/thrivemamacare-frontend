@@ -10,19 +10,21 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Dashboard,
-  Work,
-  Favorite,
-  // Assignment,
-  Star,
-  AccountCircle,
-  VerifiedUser,
-  Notifications,
-  // Payment,
-  // CalendarMonth,
-  SupportAgent,
-  Logout,
+  DashboardOutlined,
+  WorkOutline,
+  HandshakeOutlined,
+  AssignmentTurnedInOutlined,
+  FavoriteBorderOutlined,
+  PeopleAltOutlined,
+  StarBorderOutlined,
+  AccountCircleOutlined,
+  VerifiedUserOutlined,
+  RateReviewOutlined,
+  SupportAgentOutlined,
+  NotificationsNoneOutlined,
+  AccountBalanceWalletOutlined,
 } from '@mui/icons-material';
+
 import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -35,21 +37,21 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/caregiver/dashboard' },
-    { text: 'Available Jobs', icon: <Work />, path: '/caregiver/jobs' },
-    { text: 'My Application', icon: <Favorite />, path: '/caregiver/my-applications' },
-    { text: 'My Reviews', icon: <Star />, path: '/caregiver/my-reviews' },
-    { text: 'My Profile', icon: <AccountCircle />, path: '/caregiver/profile' },
-    { text: 'Documents & KYC', icon: <VerifiedUser />, path: '/caregiver/kyc' },
-    { text: 'Review', icon: <Star />, path: '/caregiver/review' },
-    { text: 'Support', icon: <SupportAgent />, path: '/caregiver/support' },
-    // { text: 'My Engagements', icon: <Assignment />, path: '/caregiver/my-engagements' },
-    { text: 'Notifications', icon: <Notifications />, path: '/caregiver/notifications' },
-    // { text: 'Earnings', icon: <Payment />, path: '/caregiver/earnings' },
-    // { text: 'Schedule', icon: <CalendarMonth />, path: '/caregiver/schedule' },
-    // 
-    { text: 'Logout', icon: <Logout />, path: '/logout' },
-  ];
+  { text: 'Dashboard', icon: <DashboardOutlined />, path: '/caregiver/dashboard' },
+  { text: 'Available Jobs', icon: <WorkOutline />, path: '/caregiver/jobs' },
+  { text: 'Available Requests', icon: <HandshakeOutlined />, path: '/caregiver/available-requests' },
+  { text: 'My Applications', icon: <AssignmentTurnedInOutlined />, path: '/caregiver/my-applications' },
+  { text: 'My Interests', icon: <FavoriteBorderOutlined />, path: '/caregiver/my-interests' },
+  { text: 'My Engagements', icon: <PeopleAltOutlined />, path: '/caregiver/my-engagements' },
+  { text: 'My Reviews', icon: <StarBorderOutlined />, path: '/caregiver/my-reviews' },
+  { text: 'My Profile', icon: <AccountCircleOutlined />, path: '/caregiver/profile' },
+  { text: 'Documents & KYC', icon: <VerifiedUserOutlined />, path: '/caregiver/kyc' },
+  { text: 'Earnings', icon: <AccountBalanceWalletOutlined />, path: '/caregiver/earnings' },
+  { text: 'Review', icon: <RateReviewOutlined />, path: '/caregiver/review' },
+  { text: 'Support', icon: <SupportAgentOutlined />, path: '/caregiver/support' },
+  { text: 'Notifications', icon: <NotificationsNoneOutlined />, path: '/caregiver/notifications' },
+
+];
 
   const drawerContent = (
     <Box sx={{ p: 2, backgroundColor: '#f5f5f5', height: '100%', width: '300px' }}>

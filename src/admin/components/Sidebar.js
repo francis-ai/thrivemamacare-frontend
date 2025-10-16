@@ -10,37 +10,40 @@ import {
 } from '@mui/material';
 import {
   Dashboard,
-  People,
-  Person,
-  Assignment,
-  Reviews,
-  // MonetizationOn,
-  // Mail,
-  // Notifications,
-  Help,
-  Settings,
-  Logout,
+  Group,              // for Manage Helpers
+  PeopleAlt,          // for Manage Users
+  Work,               // for Job Vacancy
+  AssignmentTurnedIn, // for Requests
+  RateReview,         // for Reviews
+  AccountBalanceWallet, // for Earnings
+  SupportAgent,       // for Support Tickets
+  WorkHistory,        // for Vacancies
+  Subscriptions,      // for Subscription Plans
+  Gavel,              // for Legal & Info
+  Settings,           // for Settings
+  Logout,             // for Logout
 } from '@mui/icons-material';
+
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 const menuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: 'dashboard' },
-  { text: 'Manage Helpers', icon: <People />, path: 'caregivers' },
-  { text: 'Manage Users', icon: <Person />, path: 'users' },
-  { text: 'Jobs', icon: <Assignment />, path: 'all-jobs' },
-  { text: 'Reviews', icon: <Reviews />, path: 'reviews' },
-  // { text: 'Earnings', icon: <MonetizationOn />, path: 'earnings' },
-  // { text: 'Messages', icon: <Mail />, path: 'messages' },
-  // { text: 'Notifications', icon: <Notifications />, path: 'notifications' },
-  { text: 'Support Tickets', icon: <Help />, path: 'support' },
-  { text: 'Vacancies', icon: <Help />, path: 'vacancy' },
-  { text: 'Subscription Plans', icon: <Help />, path: 'subscription' },
-  { text: 'Lagal & Info', icon: <Settings />, path: 'legal-info'},
+  { text: 'Manage Helpers', icon: <Group />, path: 'caregivers' },
+  { text: 'Manage Users', icon: <PeopleAlt />, path: 'users' },
+  { text: 'Job Vacancy', icon: <Work />, path: 'all-jobs' },
+  { text: 'Caregiver Requests', icon: <AssignmentTurnedIn />, path: 'requests' },
+  { text: 'Reviews', icon: <RateReview />, path: 'reviews' },
+  { text: 'Earnings', icon: <AccountBalanceWallet />, path: 'earnings' },
+  { text: 'Support Tickets', icon: <SupportAgent />, path: 'support' },
+  { text: 'Vacancies', icon: <WorkHistory />, path: 'vacancy' },
+  { text: 'Subscription Plans', icon: <Subscriptions />, path: 'subscription' },
+  { text: 'Legal & Info', icon: <Gavel />, path: 'legal-info' },
   { text: 'Settings', icon: <Settings />, path: 'settings' },
-  { text: 'Logout', icon: <Logout />, path: 'logout' }, 
+  { text: 'Logout', icon: <Logout />, path: 'logout' },
 ];
+
 
 const Sidebar = ({ mobileOpen, handleDrawerToggle, isMobile }) => {
   const navigate = useNavigate();

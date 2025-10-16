@@ -230,7 +230,7 @@ export default function JobDetailsCaregiver() {
                   Salary Range
                 </Typography>
                 <Typography variant="body2" sx={{ fontSize: 15 }}>
-                  ₦{job.salary_range || "Negotiable"}
+                  ₦({job.salary_range || "Negotiable"})
                 </Typography>
               </Box>
 
@@ -314,7 +314,7 @@ export default function JobDetailsCaregiver() {
                   color={primaryColor}
                   mb={1}
                 >
-                  ₦{job.salary_range || "Negotiable"}
+                  ₦({job.salary_range || "Negotiable"})
                 </Typography>
 
                 <Typography

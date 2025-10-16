@@ -48,14 +48,24 @@ const Dashboard = () => {
         </Typography>
         
         {/* Request Caregiver Button */}
-        <Button
-          variant="contained"
-          className="request-btn"
-          sx={{ mt: 2, mb: 4, backgroundColor: '#648E87' }}
-          href="/dashboard/create-job"
-        >
-          Request a Helper
-        </Button>
+        <Box sx={{display: 'flex', gap: 3}}>
+          <Button
+            variant="contained"
+            className="request-btn"
+            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+            href="/dashboard/create-job"
+          >
+            Post Job Vacancy
+          </Button>
+          <Button
+            variant="contained"
+            className="request-btn"
+            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+            href="/dashboard/request"
+          >
+            Request a Helper
+          </Button>
+        </Box>
 
         {/* Dashboard State */}
         <DashboardState />

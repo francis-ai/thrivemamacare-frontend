@@ -108,7 +108,6 @@ function App() {
                 <Route path="/payment" element={<Layout><Payment /></Layout>} />
                 <Route path="/subscription" element={<Layout><Subscription /></Layout>} />
 
-                {/* User Dashboard Section */}
                 {/* User Dashboard Section - Now wrapped in UserDashboardLayout */}
                 <Route path="/dashboard" element={<UserDashboardLayout />}>
                   <Route index element={<Dashboard />} />
@@ -119,7 +118,7 @@ function App() {
                   <Route path="account" element={<MyAccount />} />
                   <Route path="notifications" element={<Notification />} />
                   <Route path="support" element={<Support />} />
-                  <Route path="interest-caregiver" element={<InterestedCaregiver />} />
+                  <Route path="interested-caregiver" element={<InterestedCaregiver />} />
                   <Route path="approved-caregiver" element={<ApprovedCaregiver />} />
                   <Route path="request-step2" element={<RequestStep2 />} />
                   <Route path="request-step3" element={<RequestStep3 />} />

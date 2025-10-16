@@ -10,10 +10,16 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const dashboardItems = [
   {
-    title: 'Available Jobs',
+    title: 'Job Vacancies',
     icon: <AssignmentTurnedIn fontSize="large" color="primary" />,
     bgColor: '#E3F2FD',
     path: '/caregiver/jobs',
+  },
+  {
+    title: 'Available Request',
+    icon: <AssignmentTurnedIn fontSize="large" color="primary" />,
+    bgColor: '#E3F2FD',
+    path: '/caregiver/available-request',
   },
 ];
 

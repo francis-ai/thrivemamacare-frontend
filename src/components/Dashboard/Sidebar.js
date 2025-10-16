@@ -11,18 +11,19 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
-  Dashboard,
-  People,
-  ListAlt,
-  Chat,
-  Notifications,
-  AccountCircle,
-  SupportAgent,
-  Logout,
+  DashboardOutlined,
+  WorkOutline,
+  PeopleAltOutlined,
+  NotificationsNone,
+  AccountCircleOutlined,
+  SupportAgentOutlined,
+  RateReviewOutlined,
+  CheckCircleOutline,
+  FavoriteBorderOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
-const drawerWidth = 240;
+const drawerWidth = 250;
 
 const Sidebar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,19 +33,18 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
-    { text: 'Post Job', icon: <People />, path: '/dashboard/create-job' },
-    { text: 'My Jobs', icon: <ListAlt />, path: '/dashboard/my-jobs' },
-    { text: 'Applications', icon: <ListAlt />, path: '/dashboard/application' },
-    // { text: 'Approved Helper', icon: <ListAlt />, path: '/dashboard/approved-caregiver' },
-    { text: 'Review', icon: <Chat />, path: '/dashboard/review' },
-    { text: 'My Account', icon: <AccountCircle />, path: '/dashboard/account' },
-    { text: 'Support', icon: <SupportAgent />, path: '/dashboard/support' },
-    // Not fixed
-    { text: 'Notifications', icon: <Notifications />, path: '/dashboard/notifications' },
-    // { text: 'Messages', icon: <Chat />, path: '/dashboard/messages' },
-    //
-    { text: 'Logout', icon: <Logout />, path: '/logout' },
+    { text: 'Dashboard', icon: <DashboardOutlined />, path: '/dashboard' },
+    { text: 'Post Job', icon: <WorkOutline />, path: '/dashboard/create-job' },
+    { text: 'Request Helper', icon: <PeopleAltOutlined />, path: '/dashboard/request' },
+    { text: 'My Jobs', icon: <CheckCircleOutline />, path: '/dashboard/my-jobs' },
+    { text: 'My Requests', icon: <FavoriteBorderOutlined />, path: '/dashboard/my-requests' },
+    { text: 'Applications', icon: <WorkOutline />, path: '/dashboard/application' },
+    { text: 'Interested Helper', icon: <PeopleAltOutlined />, path: '/dashboard/interested-caregiver' },
+    { text: 'Approved Helper', icon: <CheckCircleOutline />, path: '/dashboard/approved-caregiver' },
+    { text: 'Reviews', icon: <RateReviewOutlined />, path: '/dashboard/review' },
+    { text: 'My Account', icon: <AccountCircleOutlined />, path: '/dashboard/account' },
+    { text: 'Support', icon: <SupportAgentOutlined />, path: '/dashboard/support' },
+    { text: 'Notifications', icon: <NotificationsNone />, path: '/dashboard/notifications' },
   ];
 
   const drawerContent = (

@@ -77,6 +77,8 @@ const Footer = () => {
       <div className="footer-bottom">
         &copy; {new Date().getFullYear()} ThriveMama. All rights reserved.
       </div>
+
+      <Link to="https://edmoss.com.ng">Powered by Edmoss</Link>
     </footer>
   );
 };

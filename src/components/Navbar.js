@@ -1,322 +1,226 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  AppBar, Toolbar, IconButton, Drawer, List, ListItem,
-  Divider, Avatar, Typography, Box, Button, useMediaQuery, useTheme, styled,
-  Menu, MenuItem, Fade
+  AppBar, Toolbar, Box, Button, Avatar, Menu, MenuItem,
+  Typography, IconButton, Drawer, List, useMediaQuery, useTheme
 } from '@mui/material';
 import {
-  Menu as MenuIcon, Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon
+  Menu as MenuIcon,
+  Close as CloseIcon,
+  Dashboard as DashboardIcon,
+  Logout as LogoutIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-const AnimatedNavLink = styled(Button)(({ theme }) => ({
-  textTransform: 'none',
-  fontWeight: 500,
-  position: 'relative',
-  color: '#648E87',
-  '&:hover': {
-    backgroundColor: 'transparent',
-    '&:after': { width: '100%' },
-  },
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    width: '0',
-    height: '2px',
-    bottom: 0,
-    left: 0,
-    backgroundColor: '#648E87',
-    transition: 'width 0.3s ease'
-  }
-}));
-
-const MobileNavLink = styled(Button)(({ theme }) => ({
-  textTransform: 'none',
-  fontWeight: 500,
-  justifyContent: 'flex-start',
-  padding: '12px 24px',
-  width: '100%',
-  color: '#648E87',
-  '&:hover': {
-    backgroundColor: 'rgba(100, 142, 135, 0.1)',
-  },
-}));
-
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
-  const [loggedInName, setLoggedInName] = useState(null);
-  const [settings, setSettings] = useState({ site_name: '', logo: '' });
+  const [user, setUser] = useState(null);
+  const [settings, setSettings] = useState({ site_name: 'ThriveMama', logo: '' });
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     const caregiver = JSON.parse(localStorage.getItem('caregiver'));
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (caregiver) setLoggedInName({ name: caregiver.name, role: 'caregiver' });
-    else if (user) setLoggedInName({ name: user.name, role: 'user' });
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (caregiver) setUser({ name: caregiver.name, role: 'caregiver' });
+    else if (userData) setUser({ name: userData.name, role: 'user' });
   }, []);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/admin/get-settings`);
-        setSettings({
-          site_name: res.data.site_name || 'ThriveMama',
-          logo: res.data.logo ? `${BASE_URL}/uploads/website-settings/${res.data.logo}` : '/ThriveMama.png'
-        });
-      } catch (err) {
-        console.error('Error fetching settings:', err);
-      }
-    };
-    fetchSettings();
+    axios.get(`${BASE_URL}/api/admin/get-settings`)
+      .then(res => setSettings({
+        site_name: res.data.site_name || 'ThriveMama',
+        logo: res.data.logo ? `${BASE_URL}/uploads/website-settings/${res.data.logo}` : ''
+      }))
+      .catch(console.error);
   }, []);
 
   const handleLogout = () => {
     localStorage.clear();
-    setLoggedInName(null);
+    setUser(null);
     navigate('/login');
-    setOpen(false);
-    handleCloseUserMenu();
+    handleCloseMenu();
   };
 
-  const toggleDrawer = (state) => () => setOpen(state);
+  const handleOpenMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
 
-  const handleOpenUserMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const navItems = [
+    { path: '/', label: 'Home' },
+    { path: '/about', label: 'About' },
+    { path: '/faq', label: 'FAQs' }
+  ];
 
-  const handleCloseUserMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const NavDrawerItem = ({ to, label, onClick }) => (
-    <ListItem
-      button
-      component={to ? Link : Button}
-      to={to}
-      onClick={onClick}
+  const NavButton = ({ path, label, mobile = false }) => (
+    <Button
+      component={Link}
+      to={path}
+      onClick={() => setMobileOpen(false)}
       sx={{
-        padding: 0,
+        display: 'block', // 👈 ensures full width (stacked)
+        width: '100%',
+        justifyContent: 'flex-start', // align text to the left
+        textAlign: 'left',
+        textTransform: 'none',
+        fontWeight: location.pathname === path ? 600 : 400,
+        color: location.pathname === path ? '#648E87' : 'text.primary',
+        px: mobile ? 3 : 2,
+        py: mobile ? 1.5 : 1,
+        borderRadius: mobile ? 1 : 2,
         '&:hover': {
-          backgroundColor: theme.palette.action.hover,
-        }
+          backgroundColor: mobile
+            ? 'rgba(100, 142, 135, 0.08)'
+            : 'transparent',
+          color: '#648E87',
+        },
       }}
     >
-      <MobileNavLink>
-        {label}
-      </MobileNavLink>
-    </ListItem>
+      {label}
+    </Button>
   );
 
+
   return (
-    <>
-      <AppBar position="fixed" sx={{
-        height: 70, 
-        backgroundColor: 'background.paper', 
-        color: 'text.primary',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', 
-        zIndex: theme.zIndex.drawer + 1
-      }}>
-        <Toolbar sx={{ 
-          justifyContent: 'space-between', 
-          px: { xs: 2, md: 4 },
-          height: '100%'
-        }}>
-          <Box component={Link} to="/" sx={{
+    <AppBar 
+      position="fixed" 
+      elevation={0}
+      sx={{
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        height: 70
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 6 } }}>
+        {/* Logo */}
+        <Box 
+          component={Link} 
+          to="/" 
+          sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            textDecoration: 'none', 
-            color: 'inherit'
-          }}>
-            <Avatar src={settings.logo} alt="Logo" sx={{ width: 40, height: 40, mr: 1.5 }} />
-            <Typography variant="h6" sx={{ 
-              fontWeight: 700, 
-              fontSize: { xs: '1.1rem', md: '1.3rem' },
-              color: '#648E87'
-            }}>
-              {settings.site_name}
-            </Typography>
-          </Box>
-
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ display: 'flex', mr: 1, gap: 1 }}>
-                <AnimatedNavLink component={Link} to="/">Home</AnimatedNavLink>
-                <AnimatedNavLink component={Link} to="/about">About Us</AnimatedNavLink>
-                <AnimatedNavLink component={Link} to="/faq">FAQs</AnimatedNavLink>
-              </Box>
-
-              {loggedInName ? (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Button
-                    onClick={handleOpenUserMenu}
-                    endIcon={<ExpandMoreIcon />}
-                    sx={{
-                      textTransform: 'none',
-                      color: '#648E87',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
-                    }}
-                  >
-                    <Avatar sx={{ width: 32, height: 32, bgcolor: '#648E87', fontSize: '0.9rem' }}>
-                      {loggedInName.name.charAt(0).toUpperCase()}
-                    </Avatar>
-                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                      {loggedInName.name}
-                    </Box>
-                  </Button>
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleCloseUserMenu}
-                    TransitionComponent={Fade}
-                    sx={{
-                      '& .MuiPaper-root': {
-                        borderRadius: 2,
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                        minWidth: 200,
-                        mt: 1
-                      }
-                    }}
-                  >
-                    <MenuItem 
-                      onClick={() => {
-                        navigate(loggedInName.role === 'caregiver' ? "/caregiver/dashboard" : "/dashboard");
-                        handleCloseUserMenu();
-                      }}
-                    >
-                      Dashboard
-                    </MenuItem>
-                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                  </Menu>
-                </Box>
-              ) : (
-                <Box sx={{ display: 'flex', gap: 1.5 }}>
-                  <AnimatedNavLink 
-                    component={Link} 
-                    to="/login" 
-                    variant="outlined"
-                    sx={{ 
-                      color: '#dd700a', 
-                      borderColor: '#dd700a', 
-                      '&:hover': { 
-                        backgroundColor: '#fdf2e8',
-                        borderColor: '#dd700a'
-                      } 
-                    }}
-                  >
-                    Login
-                  </AnimatedNavLink>
-                  <AnimatedNavLink 
-                    component={Link} 
-                    to="/register" 
-                    variant="contained"
-                    sx={{ 
-                      backgroundColor: '#648E87', 
-                      color: "#FFF",
-                      '&:hover': { 
-                        backgroundColor: '#557a73' 
-                      } 
-                    }}
-                  >
-                    Register
-                  </AnimatedNavLink>
-                </Box>
-              )}
+            textDecoration: 'none',
+            gap: 2
+          }}
+        >
+          {settings.logo ? (
+            <Avatar 
+              src={settings.logo} 
+              alt="Logo" 
+              sx={{ 
+                width: 40, 
+                height: 40,
+                border: '2px solid',
+                borderColor: '#648E87'
+              }} 
+            />
+          ) : (
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                bgcolor: '#648E87',
+                borderRadius: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '1.2rem'
+              }}
+            >
+              TM
             </Box>
           )}
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #648E87 0%, #dd700a 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            {settings.site_name}
+          </Typography>
+        </Box>
 
-          {/* Mobile Navigation Toggle */}
-          {isMobile && (
-            <IconButton 
-              onClick={toggleDrawer(true)}
-              sx={{ color: '#648E87' }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-        </Toolbar>
-      </AppBar>
-
-      {/* Mobile Drawer */}
-      <Drawer
-        anchor="right"
-        open={open}
-        onClose={toggleDrawer(false)}
-        sx={{ 
-          '& .MuiDrawer-paper': { 
-            width: 280, 
-            backgroundColor: theme.palette.background.default,
-            boxSizing: 'border-box'
-          } 
-        }}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', p: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6" sx={{ color: '#648E87', fontWeight: 600 }}>
-              Menu
-            </Typography>
-            <IconButton onClick={toggleDrawer(false)} sx={{ color: '#648E87' }}>
-              <CloseIcon />
-            </IconButton>
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {navItems.map((item) => (
+              <NavButton key={item.path} {...item} />
+            ))}
           </Box>
+        )}
 
-          <Divider sx={{ mb: 2 }} />
-
-          {loggedInName && (
-            <>
-              <Box sx={{ display: 'flex', alignItems: 'center', p: 2, mb: 1, borderRadius: 2, bgcolor: 'rgba(100, 142, 135, 0.1)' }}>
-                <Avatar sx={{ width: 40, height: 40, mr: 2, bgcolor: '#648E87', fontSize: '0.9rem' }}>
-                  {loggedInName.name.charAt(0).toUpperCase()}
-                </Avatar>
-                <Box>
-                  <Typography fontWeight={600} sx={{ color: '#648E87' }}>{loggedInName.name}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {loggedInName.role === 'caregiver' ? 'Caregiver' : 'User'}
-                  </Typography>
-                </Box>
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-            </>
-          )}
-
-          <List sx={{ flexGrow: 1 }}>
-            <NavDrawerItem to="/" label="Home" onClick={toggleDrawer(false)} />
-            <NavDrawerItem to="/about" label="About Us" onClick={toggleDrawer(false)} />
-            <NavDrawerItem to="/faq" label="FAQs" onClick={toggleDrawer(false)} />
-            
-            {loggedInName && (
-              <NavDrawerItem
-                to={loggedInName.role === 'caregiver' ? "/caregiver/dashboard" : "/dashboard"}
-                label="Dashboard"
-                onClick={toggleDrawer(false)}
-              />
-            )}
-          </List>
-
-          <Box sx={{ mt: 'auto' }}>
-            {!loggedInName ? (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {/* Desktop Auth Section */}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {user ? (
+              <>
+                <Button
+                  onClick={handleOpenMenu}
+                  startIcon={
+                    <Avatar sx={{ width: 32, height: 32, bgcolor: '#648E87', fontSize: '0.9rem' }}>
+                      {user.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                  }
+                  sx={{
+                    textTransform: 'none',
+                    color: 'text.primary',
+                    fontWeight: 500
+                  }}
+                >
+                  {user.name}
+                </Button>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleCloseMenu}
+                  sx={{
+                    '& .MuiPaper-root': {
+                      borderRadius: 2,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                      minWidth: 180,
+                      mt: 1
+                    }
+                  }}
+                >
+                  <MenuItem 
+                    onClick={() => {
+                      navigate(user.role === 'caregiver' ? "/caregiver/dashboard" : "/dashboard");
+                      handleCloseMenu();
+                    }}
+                    sx={{ gap: 2 }}
+                  >
+                    <DashboardIcon fontSize="small" />
+                    Dashboard
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout} sx={{ gap: 2 }}>
+                    <LogoutIcon fontSize="small" />
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <>
                 <Button
                   component={Link}
                   to="/login"
-                  fullWidth
-                  variant="outlined"
-                  onClick={toggleDrawer(false)}
                   sx={{
-                    color: '#dd700a',
-                    borderColor: '#dd700a',
+                    textTransform: 'none',
+                    color: 'text.primary',
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: '#fdf2e8',
-                      borderColor: '#dd700a'
+                      color: '#648E87'
                     }
                   }}
                 >
@@ -325,31 +229,158 @@ const Navbar = () => {
                 <Button
                   component={Link}
                   to="/register"
+                  variant="contained"
+                  sx={{
+                    textTransform: 'none',
+                    backgroundColor: '#648E87',
+                    borderRadius: 2,
+                    px: 3,
+                    py: 1,
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: '#557870',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 12px rgba(100, 142, 135, 0.3)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
+
+        {/* Mobile Menu Button */}
+        {isMobile && (
+          <IconButton
+            onClick={() => setMobileOpen(true)}
+            sx={{ color: 'text.primary' }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
+      </Toolbar>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="right"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 270,
+            backgroundColor: 'background.paper'
+          }
+        }}
+      >
+        <Box sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+            <Typography variant="h6" fontWeight="700" color="#648E87">
+              Menu
+            </Typography>
+            <IconButton onClick={() => setMobileOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          {/* User Info */}
+          {user && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
+              <Avatar sx={{ width: 48, height: 48, bgcolor: '#648E87' }}>
+                {user.name.charAt(0).toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography fontWeight="600">{user.name}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {user.role === 'caregiver' ? 'Caregiver' : 'User'}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {/* Navigation */}
+          <List sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            {navItems.map((item) => (
+              <NavButton key={item.path} {...item} mobile />
+            ))}
+            {user && (
+              <Button
+                component={Link}
+                to={user.role === 'caregiver' ? "/caregiver/dashboard" : "/dashboard"}
+                onClick={() => setMobileOpen(false)}
+                startIcon={<DashboardIcon />}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  width: '100%',
+                  justifyContent: 'flex-start',
+                  px: 3,
+                  py: 2,
+                  borderRadius: 0,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                Dashboard
+              </Button>
+            )}
+          </List>
+
+          {/* Auth Buttons */}
+          <Box sx={{ mt: 'auto' }}>
+            {!user ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Button
+                  component={Link}
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    textTransform: 'none',
+                    py: 1.5,
+                    borderRadius: 2,
+                    borderColor: '#648E87',
+                    color: '#648E87'
+                  }}
+                >
+                  Login
+                </Button>
+                <Button
+                  component={Link}
+                  to="/register"
+                  onClick={() => setMobileOpen(false)}
                   fullWidth
                   variant="contained"
-                  onClick={toggleDrawer(false)}
                   sx={{
+                    textTransform: 'none',
+                    py: 1.5,
+                    borderRadius: 2,
                     backgroundColor: '#648E87',
                     '&:hover': {
-                      backgroundColor: '#557a73'
+                      backgroundColor: '#557870'
                     }
                   }}
                 >
-                  Register
+                  Get Started
                 </Button>
               </Box>
             ) : (
               <Button
+                onClick={handleLogout}
                 fullWidth
                 variant="outlined"
-                onClick={handleLogout}
+                startIcon={<LogoutIcon />}
                 sx={{
-                  color: 'error.main',
+                  textTransform: 'none',
+                  py: 1.5,
+                  borderRadius: 2,
                   borderColor: 'error.main',
-                  '&:hover': {
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
-                    borderColor: 'error.main'
-                  }
+                  color: 'error.main'
                 }}
               >
                 Logout
@@ -358,7 +389,7 @@ const Navbar = () => {
           </Box>
         </Box>
       </Drawer>
-    </>
+    </AppBar>
   );
 };
 
