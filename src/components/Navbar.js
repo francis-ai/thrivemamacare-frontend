@@ -170,7 +170,7 @@ const Navbar = () => {
                   onClick={handleOpenMenu}
                   startIcon={
                     <Avatar sx={{ width: 32, height: 32, bgcolor: '#648E87', fontSize: '0.9rem' }}>
-                      {user.name.charAt(0).toUpperCase()}
+                      {user?.name?.charAt(0)?.toUpperCase() || ''}
                     </Avatar>
                   }
                   sx={{
@@ -179,7 +179,7 @@ const Navbar = () => {
                     fontWeight: 500
                   }}
                 >
-                  {user.name}
+                  {user?.name || ''}
                 </Button>
                 <Menu
                   anchorEl={anchorEl}
@@ -289,8 +289,8 @@ const Navbar = () => {
           {/* User Info */}
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, p: 2, borderRadius: 2, bgcolor: 'grey.50' }}>
-              <Avatar sx={{ width: 48, height: 48, bgcolor: '#648E87' }}>
-                {user.name.charAt(0).toUpperCase()}
+              <Avatar sx={{ width: 32, height: 32, bgcolor: '#648E87', fontSize: '0.9rem' }}>
+                {user?.name?.charAt(0)?.toUpperCase() || ''}
               </Avatar>
               <Box>
                 <Typography fontWeight="600">{user.name}</Typography>
