@@ -14,6 +14,7 @@ import CTASection from './components/CTASection';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import FacebookAdsForm from './pages/FacebookAdsForm';
+import ThankYou from './pages/ThankYou';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import WaitingList from './pages/WaitingList';
@@ -104,7 +105,8 @@ function App() {
                 <Route path="/waiting-list" element={<Layout><WaitingList /></Layout>} />
                 <Route path="/login" element={<Layout><Login /></Layout>} />
                 <Route path="/register" element={<Layout><Register /></Layout>} />
-                <Route path="/facebook-ads" element={<FacebookAdsForm />} />
+                <Route path="/apply" element={<FacebookAdsForm />} />
+                <Route path="/application-successful" element={<ThankYou />} />
                 <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
                 <Route path="/reset-password/:category/:token" element={<Layout><ResetPassword /></Layout>} />
                 <Route path="/payment" element={<Layout><Payment /></Layout>} />

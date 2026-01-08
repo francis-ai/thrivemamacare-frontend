@@ -1,237 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import { useNavigate } from 'react-router-dom';
-// import {
-//   Box,
-//   Button,
-//   TextField,
-//   FormControl,
-//   FormLabel,
-//   RadioGroup,
-//   FormControlLabel,
-//   Radio,
-//   Typography,
-//   Alert,
-//   CircularProgress,
-//   Paper,
-//   InputLabel,
-//   Select,
-//   MenuItem
-// } from '@mui/material';
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
-
-// const FacebookAdsForm = () => {
-//   const [form, setForm] = useState({
-//     name: '',
-//     email: '',
-//     phone: '',
-//     gender: '',
-//     category: '', // used in UI, but backend always gets "caregiver"
-//     location: '', // just for UI display
-//     password: '',
-//   });
-
-//   const [message, setMessage] = useState({ type: '', text: '' });
-//   const [loading, setLoading] = useState(false);
-//   const navigate = useNavigate();
-
-//   const defaultPassword = 'Thrievemama123'; // default password
-
-//   // Embed Meta Pixel
-//   useEffect(() => {
-//     const loadFbPixel = () => {
-//       if (window.fbq) return;
-
-//       window.fbq = function () {
-//         window.fbq.callMethod
-//           ? window.fbq.callMethod.apply(window.fbq, arguments)
-//           : window.fbq.queue.push(arguments);
-//       };
-//       if (!window._fbq) window._fbq = window.fbq;
-//       window.fbq.push = window.fbq;
-//       window.fbq.loaded = true;
-//       window.fbq.version = '2.0';
-//       window.fbq.queue = [];
-
-//       const t = document.createElement('script');
-//       t.async = true;
-//       t.src = 'https://connect.facebook.net/en_US/fbevents.js';
-//       const s = document.getElementsByTagName('script')[0];
-//       s.parentNode.insertBefore(t, s);
-
-//       window.fbq('init', '25601828019505286');
-//       window.fbq('track', 'PageView');
-//     };
-
-//     loadFbPixel();
-//   }, []);
-
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setForm((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-
-//     try {
-//       // Prepare payload for backend
-//       const payload = {
-//         name: form.name,
-//         email: form.email,
-//         phone: form.phone,
-//         gender: form.gender,
-//         category: 'caregiver', // always send caregiver
-//         password: defaultPassword,
-//       };
-
-//       await axios.post(`${BASE_URL}/api/auth/register`, payload);
-
-//       setMessage({ type: 'success', text: `Registered successfully! Default password: ${defaultPassword}` });
-
-//       // Reset form
-//       setForm({
-//         name: '',
-//         email: '',
-//         phone: '',
-//         gender: '',
-//         category: '',
-//         location: '',
-//         password: '',
-//       });
-
-//       // Meta Pixel event
-//       if (window.fbq) {
-//         window.fbq('track', 'CompleteRegistration');
-//       }
-
-//       setTimeout(() => navigate('/login'), 2000);
-//     } catch (err) {
-//       setMessage({
-//         type: 'error',
-//         text: err.response?.data?.message || 'Something went wrong',
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <Box
-//       minHeight="100vh"
-//       display="flex"
-//       alignItems="center"
-//       justifyContent="center"
-//       sx={{ bgcolor: '#f4f6f8', p: 2 }}
-//     >
-//       <Paper
-//         elevation={8}
-//         sx={{
-//           maxWidth: 480,
-//           width: '100%',
-//           p: 4,
-//           borderRadius: 3,
-//           bgcolor: '#ffffff',
-//         }}
-//       >
-//         <Typography variant="h5" mb={3} align="center" fontWeight="bold" color="#1976d2">
-//           Thrievemama Facebook Ads Form
-//         </Typography>
-
-//         {message.text && (
-//           <Alert severity={message.type} sx={{ mb: 2 }}>
-//             {message.text}
-//           </Alert>
-//         )}
-
-//         <form onSubmit={handleSubmit}>
-//           <TextField
-//             fullWidth
-//             label="Name"
-//             name="name"
-//             value={form.name}
-//             onChange={handleChange}
-//             margin="normal"
-//             variant="outlined"
-//           />
-//           <TextField
-//             fullWidth
-//             label="Email"
-//             name="email"
-//             value={form.email}
-//             onChange={handleChange}
-//             margin="normal"
-//             variant="outlined"
-//           />
-//           <TextField
-//             fullWidth
-//             label="Phone"
-//             name="phone"
-//             value={form.phone}
-//             onChange={handleChange}
-//             margin="normal"
-//             variant="outlined"
-//           />
-
-//           <FormControl fullWidth margin="normal">
-//             <FormLabel sx={{ color: '#333', mb: 1 }}>Gender</FormLabel>
-//             <RadioGroup row name="gender" value={form.gender} onChange={handleChange}>
-//               <FormControlLabel value="male" control={<Radio />} label="Male" />
-//               <FormControlLabel value="female" control={<Radio />} label="Female" />
-//             </RadioGroup>
-//           </FormControl>
-
-//           {/* Role (dropdown, always sends caregiver) */}
-//           <FormControl fullWidth margin="normal">
-//             <InputLabel>Role</InputLabel>
-//             <Select
-//               name="role"
-//               value={form.role} // used only for UI
-//               onChange={handleChange}
-//               label="Role"
-//             >
-//               <MenuItem value="Nanny">Nanny</MenuItem>
-//               <MenuItem value="Caregiver">Caregiver</MenuItem>
-//               <MenuItem value="Housekeeper">Housekeeper</MenuItem>
-//             </Select>
-//           </FormControl>
-
-//           {/* Location (dropdown, UI only) */}
-//           <FormControl fullWidth margin="normal">
-//             <InputLabel>Location</InputLabel>
-//             <Select
-//               name="location"
-//               value={form.location}
-//               onChange={handleChange}
-//               label="Location"
-//             >
-//               <MenuItem value="Lagos">Lagos</MenuItem>
-//               <MenuItem value="Abuja">Abuja</MenuItem>
-//             </Select>
-//           </FormControl>
-
-
-//           <Button
-//             type="submit"
-//             variant="contained"
-//             color="primary"
-//             fullWidth
-//             sx={{ mt: 3, py: 1.5, fontSize: '1rem', borderRadius: 2 }}
-//             disabled={loading}
-//           >
-//             {loading ? <CircularProgress size={24} /> : 'Register'}
-//           </Button>
-//         </form>
-//       </Paper>
-//     </Box>
-//   );
-// };
-
-// export default FacebookAdsForm;
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -257,6 +23,8 @@ import {
 import {
   CheckCircle,
 } from '@mui/icons-material';
+import Logo from '../assets/images/Thrivemam.png'; 
+
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -333,7 +101,7 @@ const FacebookAdsForm = () => {
       setSuccess(true);
       setMessage({ 
         type: 'success', 
-        text: `✓ Registration Successful! Check your email for login details. Defualt Password: Thrievemama123` 
+        text: `✓ Registration Successful! Check your email for login details.` 
       });
 
       // Reset form
@@ -356,7 +124,7 @@ const FacebookAdsForm = () => {
         });
       }
 
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/application-successful'), 3000);
     } catch (err) {
       setMessage({
         type: 'error',
@@ -388,17 +156,30 @@ const FacebookAdsForm = () => {
                 mb: 4,
               }}
             >
-              <Typography 
-                variant="h4" 
-                fontWeight="bold" 
-                color={primaryColor}
-                gutterBottom
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  mb: 4,
+                }}
               >
-                Thrievemama Registration
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Join our team of professional caregivers
-              </Typography>
+                {/* Logo */}
+                <Box
+                  component="img"
+                  src={Logo}
+                  alt="Thrievemama Logo"
+                  sx={{
+                    width: 120,
+                    height: 120, 
+                    mb: 2,
+                    mx: 'auto',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                  }}
+                />
+                <Typography variant="body1" color="text.secondary">
+                  Join our team of professional caregivers
+                </Typography>
+              </Box>
             </Box>
 
             {/* Form Container */}
