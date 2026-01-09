@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
-import { Box, Typography, Container, Alert } from '@mui/material';
+import { Box, Typography, Container, Alert, Button } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 const ThankYou = () => {
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!window.fbq) {
       (function (f, b, e, v, n, t, s) {
@@ -50,14 +53,30 @@ const ThankYou = () => {
 
         <Typography variant="body1" color="text.secondary">
           Your application has been received successfully.
-          {/* <br /> */}
-          {/* Please check your email for your login details. */}
         </Typography>
 
         <Alert severity="info" sx={{ mt: 3, borderRadius: 2 }}>
-          <strong>NB:</strong> Your default login password is{" "}
+          <strong>NB:</strong> Your default login password is{' '}
           <strong>Thrievemama123</strong>. Please change your password immediately after logging in.
         </Alert>
+
+        {/* Login Button */}
+        <Button
+          variant="contained"
+          size="large"
+          sx={{
+            mt: 4,
+            px: 4,
+            borderRadius: 3,
+            backgroundColor: '#648E87',
+            '&:hover': {
+              backgroundColor: '#557c76',
+            },
+          }}
+          onClick={() => navigate('/login')}
+        >
+          Go to Login
+        </Button>
       </Container>
     </Box>
   );
