@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import '../assets/css/Dashboard.css';
 import DashboardLayout from '../components/Dashboard/DashboardLayout';
-import { Box, Typography, Button, Card, CardContent, Dialog, DialogTitle, DialogContent } from '@mui/material';
-import { HelpOutline } from '@mui/icons-material';
-import DashboardState from '../components/Dashboard/DashboardState';
+import { Box, Typography, Button, Card, CardContent, Dialog, DialogTitle, DialogContent, Chip } from '@mui/material';
+import { HelpOutline, Star, Verified } from '@mui/icons-material';
+import FetchAllCaregiver from '../components/Dashboard/FetchCaregivers';
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
@@ -44,33 +44,27 @@ const Dashboard = () => {
     <DashboardLayout>
       <Box>
         <Typography variant="h5" gutterBottom>
-          Welcome {user?.name || 'Guest'}!
+          Welcome {user?.name || 'Guest'}!{' '}
+          {user?.is_premium ? (
+            <Chip
+              icon={<Star style={{ color: '#FFD700' }} />}
+              label="Premium User"
+              size="small"
+              color="success"
+              sx={{ ml: 1 }}
+            />
+          ) : (
+            <Chip
+              icon={<Verified />}
+              label="Standard User"
+              size="small"
+              color="default"
+              sx={{ ml: 1 }}
+            />
+          )}
         </Typography>
-        
-        {/* Request Caregiver Button */}
-        <Box sx={{display: 'flex', gap: 3}}>
-          <Button
-            variant="contained"
-            className="request-btn"
-            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-            href="/dashboard/create-job"
-          >
-            Post Job Vacancy
-          </Button>
-          <Button
-            variant="contained"
-            className="request-btn"
-            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-            href="/dashboard/request"
-          >
-            Request a Helper
-          </Button>
-        </Box>
 
-        {/* Dashboard State */}
-        <DashboardState />
-
-        {/* Contact Suppport */}
+        {/* Contact Support */}
         <Box sx={{ mt: 4 }}>
           <Card>
             <CardContent>
@@ -90,6 +84,32 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </Box>
+
+
+{/* Request Caregiver Button */}
+{/* <Box sx={{display: 'flex', gap: 3}}>
+  <Button
+    variant="contained"
+    className="request-btn"
+    sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+    href="/dashboard/create-job"
+  >
+    Post Job Vacancy
+  </Button>
+  <Button
+    variant="contained"
+    className="request-btn"
+    sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+    href="/dashboard/request"
+  >
+    Request a Helper
+  </Button>
+</Box> */}
+
+{/* Dashboard State */}
+{/* <DashboardState /> */}
+
+        <FetchAllCaregiver />
       </Box>
 
       {/* Safety Popup */}
@@ -121,3 +141,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+

@@ -28,6 +28,8 @@ import Subscription from './pages/Subscription';
 import UserDashboardLayout from './components/UserDashboardLayout';
 // User Dashboard
 import Dashboard from './pages/Dashboard';
+import Caregivers from './pages/Dashboard/Caregivers';
+import MyPlan from './pages/Dashboard/MyPlan';
 import Request from './pages/Dashboard/Request';
 import MyRequest from './pages/Dashboard/MyRequest';
 import Messages from './pages/Dashboard/Messages';
@@ -115,6 +117,8 @@ function App() {
                 {/* User Dashboard Section - Now wrapped in UserDashboardLayout */}
                 <Route path="/dashboard" element={<UserDashboardLayout />}>
                   <Route index element={<Dashboard />} />
+                  <Route path="caregivers" element={<Caregivers />} />
+                  <Route path="my-plan" element={<MyPlan />} />
                   <Route path="request" element={<Request />} />
                   <Route path="my-requests" element={<MyRequest />} />
                   <Route path="messages" element={<Messages />} />
