@@ -75,9 +75,9 @@ function Home() {
     <>
       <Hero />
       <WhyChooseUs />
-      <Vacancy />
       <AboutUs />
       <HowItWorks />
+      <Vacancy />
       <FocusedOnSafety />
       <Testimonials />
       <CTASection />

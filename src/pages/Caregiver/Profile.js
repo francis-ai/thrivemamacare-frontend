@@ -26,6 +26,8 @@ const MyAccount = () => {
     phone: '',
     address: '',
     gender: '',
+    speciality: '',
+    salary_range: '',
   });
 
   const [preview, setPreview] = useState(null);
@@ -54,6 +56,8 @@ const MyAccount = () => {
           phone: caregiverData.phone || '',
           address: caregiverData.address || '',
           gender: caregiverData.gender || '',
+          speciality: caregiverData.speciality || '',
+          salary_range: caregiverData.salary_range || '',
         });
 
         if (caregiverData.profile_image) {
@@ -90,6 +94,8 @@ const MyAccount = () => {
       form.append('phone', formData.phone);
       form.append('gender', formData.gender); // optional if you need it
       form.append('address', formData.address);
+      form.append('speciality', formData.speciality);
+      form.append('salary_range', formData.salary_range);
       if (previewFile) {
         form.append('profile_image', previewFile);
       }
@@ -213,6 +219,20 @@ const MyAccount = () => {
                   <MenuItem value="other">Other</MenuItem>
                 </Select>
               </FormControl>
+              <TextField
+                label="speciality"
+                name="speciality"
+                value={formData.speciality}
+                onChange={handleChange}
+                fullWidth
+              />
+              <TextField
+                label="Salary Range (e.g 120k - 200k)"
+                name="salary_range"
+                value={formData.salary_range}
+                onChange={handleChange}
+                fullWidth
+              />
 
               <Button
                 variant="contained"

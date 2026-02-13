@@ -42,7 +42,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <Box>
+      <Box sx={{ width: '100%', overflowX: 'hidden' }}>
         <Typography variant="h5" gutterBottom>
           Welcome {user?.name || 'Guest'}!{' '}
           {user?.is_premium ? (
@@ -65,8 +65,8 @@ const Dashboard = () => {
         </Typography>
 
         {/* Contact Support */}
-        <Box sx={{ mt: 4 }}>
-          <Card>
+        <Box sx={{ mt: 6, width: '91%' }}>
+          <Card sx={{ width: '100%', overflow: 'hidden' }}>
             <CardContent>
               <HelpOutline className="primary" />
               <Typography variant="h6">Need Help?</Typography>
@@ -86,30 +86,32 @@ const Dashboard = () => {
         </Box>
 
 
-{/* Request Caregiver Button */}
-{/* <Box sx={{display: 'flex', gap: 3}}>
-  <Button
-    variant="contained"
-    className="request-btn"
-    sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-    href="/dashboard/create-job"
-  >
-    Post Job Vacancy
-  </Button>
-  <Button
-    variant="contained"
-    className="request-btn"
-    sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-    href="/dashboard/request"
-  >
-    Request a Helper
-  </Button>
-</Box> */}
+        {/* Request Caregiver Button */}
+        {/* <Box sx={{display: 'flex', gap: 3}}>
+          <Button
+            variant="contained"
+            className="request-btn"
+            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+            href="/dashboard/create-job"
+          >
+            Post Job Vacancy
+          </Button>
+          <Button
+            variant="contained"
+            className="request-btn"
+            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
+            href="/dashboard/request"
+          >
+            Request a Helper
+          </Button>
+        </Box> */}
 
-{/* Dashboard State */}
-{/* <DashboardState /> */}
-
-        <FetchAllCaregiver />
+        {/* Dashboard State */}
+        {/* <DashboardState /> */}
+        <Box sx={{ ml: -3 }}>
+          <FetchAllCaregiver />
+        </Box>
+        
       </Box>
 
       {/* Safety Popup */}

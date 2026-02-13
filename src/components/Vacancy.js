@@ -1,231 +1,149 @@
-// src/pages/UserVacancies.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Box,
-  Tabs,
-  Tab,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  CircularProgress,
-  Chip,
-  Avatar,
-  IconButton,
-  Paper,
-  Stack,
-  useTheme,
-  useMediaQuery,
-} from "@mui/material";
-import { ChevronLeft, ChevronRight, Person, FamilyRestroom } from "@mui/icons-material";
+import { Verified, Pending } from "@mui/icons-material";
+import { useAuthUser } from "../context/AuthContextUser";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const DEFAULT_AVATAR =
+  "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-const UserVacancies = () => {
-  const [vacancies, setVacancies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [tabValue, setTabValue] = useState(0);
-  const [scrollPos, setScrollPos] = useState(0);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+export default function FetchAllCaregiver() {
+  const { user } = useAuthUser();
+  const navigate = useNavigate();
+
+  const [caregivers, setCaregivers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    (async () => {
+    const fetchCaregivers = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${BASE_URL}/api/admin/vacancy`);
-        setVacancies(res.data || []);
+        setError("");
+        const res = await axios.get(`${BASE_URL}/api/users/caregivers`);
+        setCaregivers(res.data.caregivers || []);
       } catch (err) {
         console.error(err);
+        setError("Failed to fetch caregivers.");
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    fetchCaregivers();
   }, []);
 
-  const scrollContainer = (dir) => {
-    const container = document.getElementById("scroll-container");
-    if (container) {
-      const newPos = dir === "left" ? Math.max(0, scrollPos - 300) : scrollPos + 300;
-      container.scrollTo({ left: newPos, behavior: "smooth" });
-      setScrollPos(newPos);
+  // Pick top 3 caregivers (verified first)
+  let featuredCaregivers = [];
+  if (caregivers.length > 0) {
+    const verified = caregivers.filter((cg) => cg.status === "verified");
+    const others = caregivers.filter((cg) => cg.status !== "verified");
+    featuredCaregivers = [...verified];
+
+    if (featuredCaregivers.length < 3) {
+      const needed = 3 - featuredCaregivers.length;
+      const randomFill = others.sort(() => 0.5 - Math.random()).slice(0, needed);
+      featuredCaregivers = [...featuredCaregivers, ...randomFill];
+    }
+
+    featuredCaregivers = featuredCaregivers.slice(0, 3);
+  }
+
+  const handleViewCaregiver = (cgId) => {
+    if (user) {
+      // User is logged in, go to dashboard or caregiver detail page
+      navigate(`/dashboard/caregivers`);
+    } else {
+      // Not logged in, redirect to login page
+      navigate("/login");
     }
   };
 
-  const cards = (type) => {
-    const filtered = vacancies.filter(v => v.category === type);
-    if (!filtered.length)
-      return (
-        <Paper sx={{ p: 4, textAlign: "center", borderRadius: 3 }}>
-          <Typography>No {type === "caregiver" ? "caregivers" : "jobs"} available</Typography>
-        </Paper>
-      );
-
-    return filtered.map(v => (
-      <Card
-        key={v.id}
-        sx={{
-          minWidth: 280,
-          maxWidth: 320,
-          borderRadius: 3,
-          boxShadow: "0 6px 24px rgba(0,0,0,0.08)",
-          flexShrink: 0,
-          mr: 2,
-          transition: "0.3s",
-          "&:hover": { transform: "translateY(-4px)", boxShadow: "0 10px 30px rgba(0,0,0,0.12)" },
-        }}
-      >
-        <CardContent sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Avatar
-              src={v.caregiver_image ? `${BASE_URL}/${v.caregiver_image}` : undefined}
-              sx={{ width: 50, height: 50, bgcolor: v.category === "user" ? "#dd700a" : "primary.light" }}
-            >
-              {v.category === "caregiver" ? <Person /> : <FamilyRestroom />}
-            </Avatar>
-            <Box>
-              <Typography fontWeight={700} variant="subtitle1">
-                {v.category === "caregiver" ? v.caregiver_name : "Care Needed"}
-              </Typography>
-              {v.category === "caregiver" && (
-                <Typography variant="body2" color="text.secondary">
-                  {v.caregiver_address}
-                </Typography>
-              )}
-            </Box>
-          </Stack>
-
-          {v.category === "caregiver" && (
-            <Chip label={v.job_offer} size="small" color="primary" sx={{ fontWeight: 600 }} />
-          )}
-
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {v.category === "caregiver" ? v.caregiver_bio : v.user_job_description}
-          </Typography>
-
-          <Typography fontWeight={700} color={v.category === "caregiver" ? "primary.main" : "#dd700a"}>
-            ₦{v.category === "caregiver" ? v.caregiver_rate : v.user_amount_offered}
-          </Typography>
-
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: v.category === "caregiver" ? "#648E87" : "#dd700a",
-              "&:hover": { bgcolor: v.category === "caregiver" ? "#557870" : "#b55a07" },
-              textTransform: "none",
-              mt: 1,
-              borderRadius: 2,
-            }}
-          >
-            {v.category === "caregiver" ? "Book Now" : "Apply Now"}
-          </Button>
-        </CardContent>
-      </Card>
-    ));
-  };
-
   return (
-    <Box sx={{ p: { xs: 2, sm: 4 }, bgcolor: "grey.50" }}>
-      <Box textAlign="center" mb={4}>
-        <Typography
-          variant="h4"
-          fontWeight={600}
-          sx={{
-            mb: 1,
-            background: "linear-gradient(135deg, #648E87, #dd700a)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Find Your Perfect Match
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Discover qualified caregivers or post your caregiving needs
-        </Typography>
-      </Box>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">Featured Caregivers</h2>
+      <p className="text-gray-600 mb-6">Carefully selected caregivers available right now</p>
 
-      <Paper sx={{ mb: 3, maxWidth: 400, mx: "auto", borderRadius: 3, boxShadow: 2 }}>
-        <Tabs
-          value={tabValue}
-          onChange={(e, val) => setTabValue(val)}
-          centered
-          sx={{ "& .MuiTab-root": { textTransform: "none", fontWeight: 700, px: 3 } }}
-          TabIndicatorProps={{ style: { backgroundColor: tabValue === 0 ? "#648E87" : "#dd700a", height: 3 } }}
-        >
-          <Tab icon={<Person />} iconPosition="start" label="Caregivers" />
-          <Tab icon={<FamilyRestroom />} iconPosition="start" label="Jobs" />
-        </Tabs>
-      </Paper>
+      {error && (
+        <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6">{error}</div>
+      )}
 
-      <Box sx={{ position: "relative", display: "flex", justifyContent: "center" }}>
-        {isMobile && (
-          <>
-            <IconButton
-              onClick={() => scrollContainer("left")}
-              sx={{
-                position: "absolute",
-                left: -10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 2,
-                bgcolor: "white",
-                "&:hover": { bgcolor: "grey.100" },
-              }}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-6 border rounded-xl animate-pulse bg-gray-100">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-full bg-gray-300"></div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                </div>
+              </div>
+              <div className="h-6 bg-gray-300 rounded"></div>
+            </div>
+          ))}
+        </div>
+      ) : featuredCaregivers.length === 0 ? (
+        <div className="text-center py-16 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">No Caregivers Available</h3>
+          <p className="text-gray-600">Check back later for featured caregivers</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredCaregivers.map((cg) => (
+            <div
+              key={cg.id}
+              className="bg-white border border-gray-100 rounded-xl shadow hover:shadow-lg transition p-6 flex flex-col gap-4"
             >
-              <ChevronLeft />
-            </IconButton>
-            <IconButton
-              onClick={() => scrollContainer("right")}
-              sx={{
-                position: "absolute",
-                right: -10,
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 2,
-                bgcolor: "white",
-                "&:hover": { bgcolor: "grey.100" },
-              }}
-            >
-              <ChevronRight />
-            </IconButton>
-          </>
-        )}
+              <div className="flex items-center gap-4">
+                <img
+                  src={cg.profile_image ? `${BASE_URL}/uploads/caregivers/${cg.profile_image}` : DEFAULT_AVATAR}
+                  alt={cg.name}
+                  className="w-16 h-16 rounded-full border-2 border-[#648E87] object-cover"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-800">{cg.name || "—"}</h3>
+                    <span
+                      className={`text-xs font-medium px-2 py-1 rounded ${
+                        cg.status === "verified"
+                          ? "bg-[#648E87]/10 text-[#648E87]"
+                          : "bg-[#dd700a]/10 text-[#dd700a]"
+                      } flex items-center gap-1`}
+                    >
+                      {cg.status === "verified" ? <Verified fontSize="small" /> : <Pending fontSize="small" />}
+                      {cg.status === "verified" ? "Verified" : "Not Verified"}
+                    </span>
+                  </div>
+                  {/* <p className="text-gray-600 text-sm break-words">
+                    {cg.email || "—"} • {cg.phone || "—"}
+                  </p> */}
+                  <p className="text-gray-600 text-sm">
+                    {cg.gender ? cg.gender.charAt(0).toUpperCase() + cg.gender.slice(1) : "—"}
+                    {cg.speciality && ` • ${cg.speciality}`}
+                  </p>
+                </div>
+              </div>
 
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-            <CircularProgress size={50} sx={{ color: "#648E87" }} />
-          </Box>
-        ) : (
-          <Box
-            id="scroll-container"
-            sx={{
-              display: "flex",
-              justifyContent: isMobile ? "flex-start" : "center",
-              overflowX: isMobile ? "auto" : "visible",
-              flexWrap: isMobile ? "nowrap" : "wrap",
-              gap: 2,
-              pb: 2,
-              px: 1,
-              "&::-webkit-scrollbar": { display: "none" },
-            }}
-          >
-            {tabValue === 0 ? cards("caregiver") : cards("user")}
-          </Box>
-        )}
-      </Box>
-    </Box>
+              <div className="bg-gray-50 p-3 rounded-xl text-center">
+                <p className="text-gray-500 text-xs">Salary Range</p>
+                <p className="font-semibold text-[#648E87]">
+                  ₦{cg.salary_range || "—"}
+                </p>
+              </div>
+
+              {/* View Caregiver Button */}
+              <button
+                onClick={handleViewCaregiver}
+                className="mt-2 bg-[#648E87] hover:bg-[#4f706a] text-white font-semibold py-2 px-4 rounded-lg transition"
+              >
+                View Caregiver
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
-};
-
-export default UserVacancies;
+}

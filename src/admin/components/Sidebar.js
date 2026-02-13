@@ -12,12 +12,12 @@ import {
   Dashboard,
   Group,              // for Manage Helpers
   PeopleAlt,          // for Manage Users
-  Work,               // for Job Vacancy
-  AssignmentTurnedIn, // for Requests
+  // Work,               // for Job Vacancy
+  // AssignmentTurnedIn, // for Requests
   RateReview,         // for Reviews
-  AccountBalanceWallet, // for Earnings
+  // AccountBalanceWallet, // for Earnings
   SupportAgent,       // for Support Tickets
-  WorkHistory,        // for Vacancies
+  // WorkHistory,        // for Vacancies
   Subscriptions,      // for Subscription Plans
   Gavel,              // for Legal & Info
   Settings,           // for Settings
@@ -32,12 +32,12 @@ const menuItems = [
   { text: 'Dashboard', icon: <Dashboard />, path: 'dashboard' },
   { text: 'Manage Helpers', icon: <Group />, path: 'caregivers' },
   { text: 'Manage Users', icon: <PeopleAlt />, path: 'users' },
-  { text: 'Job Vacancy', icon: <Work />, path: 'all-jobs' },
-  { text: 'Caregiver Requests', icon: <AssignmentTurnedIn />, path: 'requests' },
+  // { text: 'Job Vacancy', icon: <Work />, path: 'all-jobs' },
+  // { text: 'Caregiver Requests', icon: <AssignmentTurnedIn />, path: 'requests' },
   { text: 'Reviews', icon: <RateReview />, path: 'reviews' },
-  { text: 'Earnings', icon: <AccountBalanceWallet />, path: 'earnings' },
+  // { text: 'Earnings', icon: <AccountBalanceWallet />, path: 'earnings' },
   { text: 'Support Tickets', icon: <SupportAgent />, path: 'support' },
-  { text: 'Vacancies', icon: <WorkHistory />, path: 'vacancy' },
+  // { text: 'Vacancies', icon: <WorkHistory />, path: 'vacancy' },
   { text: 'Subscription Plans', icon: <Subscriptions />, path: 'subscription' },
   { text: 'Legal & Info', icon: <Gavel />, path: 'legal-info' },
   { text: 'Settings', icon: <Settings />, path: 'settings' },
