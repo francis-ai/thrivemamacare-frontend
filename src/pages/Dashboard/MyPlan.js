@@ -43,7 +43,7 @@ export default function MyPlan() {
         setError("");
 
         const res = await axios.get(
-          `${BASE_URL}/api/users/subscription/my-plan/${user.id}`
+          `${BASE_URL}/api/users/my-plan/${user.id}`
         );
 
         setPlan(res.data.plan);
@@ -324,3 +324,6 @@ export default function MyPlan() {
     </DashboardLayout>
   );
 }
+
+
+
