@@ -18,6 +18,8 @@ import {
   Button,
   useMediaQuery,
   useTheme,
+  Switch,
+  FormControlLabel,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,7 +36,6 @@ const ManageUsers = () => {
   const [users, setUsers] = useState([]);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -42,7 +43,7 @@ const ManageUsers = () => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/api/admin/users`);
-        setUsers(res.data);
+        setUsers(res.data.users || res.data); // adapt to API response
       } catch (err) {
         console.error('Failed to fetch users:', err);
       }
@@ -84,12 +85,36 @@ const ManageUsers = () => {
     }
   };
 
+  // Toggle premium status
+  const handleTogglePremium = async (user) => {
+    try {
+      const newStatus = user.is_premium ? 0 : 1;
+      await axios.put(`${BASE_URL}/api/admin/user/subscription-status/${user.id}`, {
+        is_premium: newStatus,
+      });
+
+      // Update local state
+      setUsers((prev) =>
+        prev.map((u) => (u.id === user.id ? { ...u, is_premium: newStatus } : u))
+      );
+
+      // Update selectedUser if modal is open
+      if (selectedUser?.id === user.id) {
+        setSelectedUser((prev) => ({ ...prev, is_premium: newStatus }));
+      }
+    } catch (err) {
+      console.error('Failed to update premium status:', err);
+      alert('Failed to update premium status.');
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" mb={2}>
         Manage Users
       </Typography>
 
+      {/* Search */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
         <TextField
           variant="outlined"
@@ -103,6 +128,7 @@ const ManageUsers = () => {
         />
       </Box>
 
+      {/* Users Table */}
       <Paper sx={{ overflowX: 'hidden' }}>
         <TableContainer sx={{ overflowX: 'auto' }}>
           <Table>
@@ -161,7 +187,7 @@ const ManageUsers = () => {
         />
       </Paper>
 
-      {/* View Details Modal */}
+      {/* User Details Modal */}
       <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
         <DialogTitle>User Details</DialogTitle>
         <DialogContent dividers>
@@ -171,6 +197,16 @@ const ManageUsers = () => {
               <Typography><strong>Email:</strong> {selectedUser.email}</Typography>
               <Typography><strong>Phone:</strong> {selectedUser.phone}</Typography>
               <Typography><strong>Gender:</strong> {selectedUser.gender}</Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={!!selectedUser.is_premium}
+                    onChange={() => handleTogglePremium(selectedUser)}
+                    color="success"
+                  />
+                }
+                label="Premium User"
+              />
             </>
           )}
         </DialogContent>
