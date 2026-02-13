@@ -18,6 +18,10 @@ import {
   Button,
   useMediaQuery,
   useTheme,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
   Switch,
   FormControlLabel,
 } from '@mui/material';
@@ -26,29 +30,39 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
+const planOptions = ['All-Inclusive Bundle', 'One-Time Access'];
 
 const ManageUsers = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
   const [users, setUsers] = useState([]);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [openDetailsModal, setOpenDetailsModal] = useState(false);
+  const [openSubscriptionModal, setOpenSubscriptionModal] = useState(false);
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+
+  const [subscriptionForm, setSubscriptionForm] = useState({
+    is_premium: 0,
+    current_plan: '',
+    plan_expires_at: '',
+  });
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await axios.get(`${BASE_URL}/api/admin/users`);
-        setUsers(res.data.users || res.data); // adapt to API response
+        setUsers(res.data.users || res.data);
       } catch (err) {
         console.error('Failed to fetch users:', err);
       }
     };
-
     fetchUsers();
   }, []);
 
@@ -60,59 +74,66 @@ const ManageUsers = () => {
 
   const handleChangePage = (_, newPage) => setPage(newPage);
 
-  const handleOpenModal = (user) => {
+  /** --- View Details Modal --- */
+  const handleOpenDetails = (user) => {
     setSelectedUser(user);
-    setOpenModal(true);
+    setOpenDetailsModal(true);
   };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
+  const handleCloseDetails = () => {
     setSelectedUser(null);
+    setOpenDetailsModal(false);
   };
 
+  /** --- Delete User --- */
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
-
     try {
       await axios.delete(`${BASE_URL}/api/admin/delete-user/${userToDelete.id}`);
       setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
       setOpenConfirmDialog(false);
-      setOpenModal(false);
       setUserToDelete(null);
-    } catch (error) {
-      console.error('Failed to delete user:', error);
-      alert('Failed to delete user. Please try again.');
+      if (selectedUser?.id === userToDelete.id) setOpenDetailsModal(false);
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      alert('Failed to delete user.');
     }
   };
 
-  // Toggle premium status
-  const handleTogglePremium = async (user) => {
+  /** --- Subscription Modal --- */
+  const handleOpenSubscriptionForm = (user) => {
+    setSelectedUser(user);
+    setSubscriptionForm({
+      is_premium: user.is_premium || 0,
+      current_plan: user.current_plan || '',
+      plan_expires_at: user.plan_expires_at || '',
+    });
+    setOpenSubscriptionModal(true);
+  };
+
+  const handleSubscriptionChange = (field, value) => {
+    setSubscriptionForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleUpdateSubscription = async () => {
     try {
-      const newStatus = user.is_premium ? 0 : 1;
-      await axios.put(`${BASE_URL}/api/admin/user/subscription-status/${user.id}`, {
-        is_premium: newStatus,
-      });
-
-      // Update local state
-      setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? { ...u, is_premium: newStatus } : u))
+      await axios.put(
+        `${BASE_URL}/api/admin/user/subscription-status/${selectedUser.id}`,
+        subscriptionForm
       );
-
-      // Update selectedUser if modal is open
-      if (selectedUser?.id === user.id) {
-        setSelectedUser((prev) => ({ ...prev, is_premium: newStatus }));
-      }
+      setUsers((prev) =>
+        prev.map((u) => (u.id === selectedUser.id ? { ...u, ...subscriptionForm } : u))
+      );
+      setOpenSubscriptionModal(false);
+      setSelectedUser(null);
     } catch (err) {
-      console.error('Failed to update premium status:', err);
-      alert('Failed to update premium status.');
+      console.error('Failed to update subscription:', err);
+      alert('Failed to update subscription.');
     }
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" mb={2}>
-        Manage Users
-      </Typography>
+      <Typography variant="h5" mb={2}>Manage Users</Typography>
 
       {/* Search */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
@@ -122,9 +143,7 @@ const ManageUsers = () => {
           placeholder="Search by name or email"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          InputProps={{
-            endAdornment: <SearchIcon sx={{ color: 'gray' }} />,
-          }}
+          InputProps={{ endAdornment: <SearchIcon sx={{ color: 'gray' }} /> }}
         />
       </Box>
 
@@ -135,12 +154,10 @@ const ManageUsers = () => {
             <TableHead sx={{ backgroundColor: '#648E87' }}>
               <TableRow>
                 <TableCell sx={{ color: 'white' }}>Name</TableCell>
-                {!isMobile && (
-                  <>
-                    <TableCell sx={{ color: 'white' }}>Email</TableCell>
-                    <TableCell sx={{ color: 'white' }}>Phone</TableCell>
-                  </>
-                )}
+                {!isMobile && <>
+                  <TableCell sx={{ color: 'white' }}>Email</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Phone</TableCell>
+                </>}
                 <TableCell sx={{ color: 'white' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -150,25 +167,42 @@ const ManageUsers = () => {
                 .map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>{user.name}</TableCell>
-                    {!isMobile && (
-                      <>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.phone}</TableCell>
-                      </>
-                    )}
+                    {!isMobile && <>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.phone}</TableCell>
+                    </>}
                     <TableCell>
-                      <Typography
-                        sx={{ color: 'blue', cursor: 'pointer' }}
-                        onClick={() => handleOpenModal(user)}
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleOpenDetails(user)}
+                        sx={{ mr: 1, textTransform: 'none' }}
                       >
                         View Details
-                      </Typography>
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => { setUserToDelete(user); setOpenConfirmDialog(true); }}
+                        sx={{ mr: 1, textTransform: 'none' }}
+                      >
+                        Delete
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleOpenSubscriptionForm(user)}
+                        sx={{ textTransform: 'none' }}
+                      >
+                        {user.is_premium ? 'Premium' : 'Standard'} - {user.current_plan || '-'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               {filteredUsers.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={isMobile ? 2 : 4} align="center">
+                  <TableCell colSpan={isMobile ? 3 : 4} align="center">
                     No users found.
                   </TableCell>
                 </TableRow>
@@ -176,7 +210,6 @@ const ManageUsers = () => {
             </TableBody>
           </Table>
         </TableContainer>
-
         <TablePagination
           component="div"
           count={filteredUsers.length}
@@ -187,8 +220,8 @@ const ManageUsers = () => {
         />
       </Paper>
 
-      {/* User Details Modal */}
-      <Dialog open={openModal} onClose={handleCloseModal} fullWidth maxWidth="sm">
+      {/* Details Modal */}
+      <Dialog open={openDetailsModal} onClose={handleCloseDetails} fullWidth maxWidth="sm">
         <DialogTitle>User Details</DialogTitle>
         <DialogContent dividers>
           {selectedUser && (
@@ -197,31 +230,60 @@ const ManageUsers = () => {
               <Typography><strong>Email:</strong> {selectedUser.email}</Typography>
               <Typography><strong>Phone:</strong> {selectedUser.phone}</Typography>
               <Typography><strong>Gender:</strong> {selectedUser.gender}</Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetails}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Subscription Modal */}
+      <Dialog open={openSubscriptionModal} onClose={() => setOpenSubscriptionModal(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Update Subscription</DialogTitle>
+        <DialogContent dividers>
+          {selectedUser && (
+            <>
               <FormControlLabel
                 control={
                   <Switch
-                    checked={!!selectedUser.is_premium}
-                    onChange={() => handleTogglePremium(selectedUser)}
+                    checked={!!subscriptionForm.is_premium}
+                    onChange={(e) => handleSubscriptionChange('is_premium', e.target.checked ? 1 : 0)}
                     color="success"
                   />
                 }
                 label="Premium User"
               />
+              <Box sx={{ mt: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Current Plan</InputLabel>
+                  <Select
+                    value={subscriptionForm.current_plan}
+                    label="Current Plan"
+                    onChange={(e) => handleSubscriptionChange('current_plan', e.target.value)}
+                  >
+                    {planOptions.map((plan) => (
+                      <MenuItem key={plan} value={plan}>{plan}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <TextField
+                  type="date"
+                  label="Plan Expire At"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={subscriptionForm.plan_expires_at}
+                  onChange={(e) => handleSubscriptionChange('plan_expires_at', e.target.value)}
+                />
+              </Box>
             </>
           )}
         </DialogContent>
         <DialogActions>
-          <Button
-            startIcon={<DeleteIcon />}
-            color="error"
-            onClick={() => {
-              setUserToDelete(selectedUser);
-              setOpenConfirmDialog(true);
-            }}
-          >
-            Delete
-          </Button>
-          <Button onClick={handleCloseModal}>Close</Button>
+          <Button onClick={() => setOpenSubscriptionModal(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleUpdateSubscription}>Update</Button>
         </DialogActions>
       </Dialog>
 
@@ -229,16 +291,11 @@ const ManageUsers = () => {
       <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent dividers>
-          <Typography>
-            Are you sure you want to delete{' '}
-            <strong>{userToDelete?.name}</strong>?
-          </Typography>
+          <Typography>Are you sure you want to delete <strong>{userToDelete?.name}</strong>?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleDeleteUser}>
-            Confirm
-          </Button>
+          <Button variant="contained" color="error" onClick={handleDeleteUser}>Confirm</Button>
         </DialogActions>
       </Dialog>
     </Box>
