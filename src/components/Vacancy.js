@@ -104,7 +104,7 @@ export default function FetchAllCaregiver() {
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <h5 className="font-semibold text-gray-800">{cg.name || "—"}</h5>
+                    <h5 className="font-semibold text-gray-700">{cg.name || "—"}</h5>
                     <span
                       className={`text-xs font-medium px-2 py-1 rounded ${
                         cg.status === "verified"
