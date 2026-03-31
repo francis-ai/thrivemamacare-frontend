@@ -17,6 +17,17 @@ import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+const parsePreferences = (value) => {
+  if (!value) return {};
+  if (typeof value === 'object') return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
+};
+
 const Requests = () => {
   const [requests, setRequests] = useState([]);
   const [search, setSearch] = useState('');
@@ -41,7 +52,7 @@ const Requests = () => {
   const filteredRequests = requests.filter(
     (req) =>
       req?.name?.toLowerCase().includes(search) ||
-      req?.service?.toLowerCase().includes(search) ||
+      (req?.service || req?.primary_role || '').toLowerCase().includes(search) ||
       req?.status?.toLowerCase().includes(search)
   );
 
@@ -86,8 +97,12 @@ const Requests = () => {
                 <TableCell sx={{ color: '#fff' }}>#</TableCell>
                 <TableCell sx={{ color: '#fff' }}>User</TableCell>
                 <TableCell sx={{ color: '#fff' }}>Service Type</TableCell>
+                <TableCell sx={{ color: '#fff' }}>Primary Role</TableCell>
                 <TableCell sx={{ color: '#fff' }}>Duration</TableCell>
+                <TableCell sx={{ color: '#fff' }}>Location</TableCell>
+                <TableCell sx={{ color: '#fff' }}>Preferences</TableCell>
                 <TableCell sx={{ color: '#fff' }}>Offer Amount</TableCell>
+                <TableCell sx={{ color: '#fff' }}>Matches</TableCell>
                 <TableCell sx={{ color: '#fff' }}>Status</TableCell>
                 <TableCell sx={{ color: '#fff' }}>Submitted On</TableCell>
               </TableRow>
@@ -95,20 +110,32 @@ const Requests = () => {
             <TableBody>
               {filteredRequests.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={11} align="center">
                     No caregiver requests found.
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredRequests
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((req, index) => (
+                  .map((req, index) => {
+                    const preferences = parsePreferences(req.preferences);
+                    return (
                     <TableRow key={req.id}>
                       <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                       <TableCell>{req.name || 'N/A'}</TableCell>
                       <TableCell>{req.service || 'N/A'}</TableCell>
+                      <TableCell>{req.primary_role || 'N/A'}</TableCell>
                       <TableCell>{req.duration || 'N/A'}</TableCell>
+                      <TableCell>{req.state || req.address || 'N/A'}</TableCell>
+                      <TableCell>
+                        {preferences.ethnicity && preferences.ethnicity !== 'Any' ? preferences.ethnicity : '-'}
+                        {' / '}
+                        {preferences.religion && preferences.religion !== 'Any' ? preferences.religion : '-'}
+                      </TableCell>
                       <TableCell>{req.offer_amount || 'N/A'}</TableCell>
+                      <TableCell>
+                        {Number(req.accepted_matches || 0)} / {Number(req.total_matches || 0)}
+                      </TableCell>
                       <TableCell>
                         <Chip
                           label={req.status || 'Unknown'}
@@ -122,7 +149,7 @@ const Requests = () => {
                           : 'N/A'}
                       </TableCell>
                     </TableRow>
-                  ))
+                  )})
               )}
             </TableBody>
           </Table>

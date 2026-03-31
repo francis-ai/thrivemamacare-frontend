@@ -67,6 +67,34 @@ const CaregiverProfileEnhanced = () => {
   const [newCertification, setNewCertification] = useState('');
   const [activeTab, setActiveTab] = useState('basic'); // basic, matching, professional
 
+  const normalizeCertifications = (value) => {
+    if (Array.isArray(value)) return value;
+    if (!value) return [];
+
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return value
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+    }
+
+    return [];
+  };
+
+  const normalizeDateForInput = (value) => {
+    if (!value) return '';
+    if (typeof value === 'string') return value.slice(0, 10);
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toISOString().slice(0, 10);
+  };
+
   // Nigerian states
   const NIGERIAN_STATES = [
     'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
@@ -112,7 +140,7 @@ const CaregiverProfileEnhanced = () => {
         });
 
         setMatchingInfo({
-          birthday: data.birthday || '',
+          birthday: normalizeDateForInput(data.birthday),
           primary_role: data.primary_role || '',
           accommodation_type: data.accommodation_type || '',
           state: data.state || '',
@@ -124,7 +152,7 @@ const CaregiverProfileEnhanced = () => {
         setProfessionalInfo({
           speciality: data.speciality || '',
           salary_range: data.salary_range || '',
-          certifications: data.certifications ? JSON.parse(data.certifications) : [],
+          certifications: normalizeCertifications(data.certifications),
         });
 
         if (data.profile_image) {
@@ -168,7 +196,7 @@ const CaregiverProfileEnhanced = () => {
     if (newCertification.trim()) {
       setProfessionalInfo((prev) => ({
         ...prev,
-        certifications: [...prev.certifications, newCertification.trim()]
+        certifications: [...normalizeCertifications(prev.certifications), newCertification.trim()]
       }));
       setNewCertification('');
     }
@@ -178,7 +206,7 @@ const CaregiverProfileEnhanced = () => {
   const removeCertification = (index) => {
     setProfessionalInfo((prev) => ({
       ...prev,
-      certifications: prev.certifications.filter((_, i) => i !== index)
+      certifications: normalizeCertifications(prev.certifications).filter((_, i) => i !== index)
     }));
   };
 
@@ -200,7 +228,7 @@ const CaregiverProfileEnhanced = () => {
       formData.append('address', basicInfo.address);
       
       // Matching info
-      formData.append('birthday', matchingInfo.birthday);
+      formData.append('birthday', normalizeDateForInput(matchingInfo.birthday));
       formData.append('primary_role', matchingInfo.primary_role);
       formData.append('accommodation_type', matchingInfo.accommodation_type);
       formData.append('state', matchingInfo.state);
@@ -211,7 +239,7 @@ const CaregiverProfileEnhanced = () => {
       // Professional info
       formData.append('speciality', professionalInfo.speciality);
       formData.append('salary_range', professionalInfo.salary_range);
-      formData.append('certifications', JSON.stringify(professionalInfo.certifications));
+      formData.append('certifications', JSON.stringify(normalizeCertifications(professionalInfo.certifications)));
       
       // Profile image
       if (previewFile) {
@@ -394,11 +422,11 @@ const CaregiverProfileEnhanced = () => {
                   Availability & Matching Preferences
                 </Typography>
 
-                <alert sx={{ mb: 2, p: 2, backgroundColor: '#f0f7f7', borderRadius: '8px' }}>
+                <Alert severity="info" sx={{ mb: 2 }}>
                   <Typography variant="body2" sx={{ color: '#333' }}>
                     These details help families find you more easily. Fill them in completely for better match results.
                   </Typography>
-                </alert>
+                </Alert>
 
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
@@ -595,7 +623,7 @@ const CaregiverProfileEnhanced = () => {
                       </Box>
 
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {professionalInfo.certifications.map((cert, index) => (
+                        {normalizeCertifications(professionalInfo.certifications).map((cert, index) => (
                           <Chip
                             key={index}
                             label={cert}

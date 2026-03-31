@@ -16,8 +16,6 @@ import {
   Paper,
   Divider,
   Stack,
-  Tab,
-  Tabs,
   Pagination,
 } from '@mui/material';
 import DashboardLayout from '../../components/Caregiver/DashboardLayout';
@@ -45,7 +43,6 @@ const CaregiverViewMatches = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
   const [page, setPage] = useState(1);
   const matchesPerPage = 6;
 
@@ -78,45 +75,15 @@ const CaregiverViewMatches = () => {
     fetchMatches();
   }, [caregiverId]);
 
-  const handleShowInterest = async (match) => {
-    setLoading(true);
+   console.log(setSuccessMessage)
 
-    try {
-      await axios.post(
-        `${BASE_URL}/api/matches/interest/${caregiverId}`,
-        { matchId: match.id }
-      );
-
-      setSuccessMessage('Interest recorded! The client will be notified.');
-      setTimeout(() => {
-        setSuccessMessage('');
-        setDetailsOpen(false);
-        // Update match status
-        setMatches(
-          matches.map((m) =>
-            m.id === match.id ? { ...m, status: 'Interested' } : m
-          )
-        );
-      }, 1500);
-    } catch (err) {
-      console.error('Error showing interest:', err);
-      setError(err.response?.data?.message || 'Failed to show interest');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Split matches into available and interested
-  const availableMatches = matches.filter(
-    (m) => m.status === 'Generated' || m.status === 'Viewed'
-  );
-  const interestedMatches = matches.filter((m) => m.status === 'Interested');
-
-  const displayMatches = activeTab === 0 ? availableMatches : interestedMatches;
+  // Show only successful matches accepted by users
+  const displayMatches = matches.filter((m) => m.status === 'Accepted');
   const paginatedMatches = displayMatches.slice(
     (page - 1) * matchesPerPage,
     page * matchesPerPage
   );
+
 
   if (!caregiverId) {
     return (
@@ -136,24 +103,16 @@ const CaregiverViewMatches = () => {
         {/* Header */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#648E87', mb: 1 }}>
-            Available Requests
+            Successful Matches
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            Browse through client requests that match your profile and show interest
+            These are requests where you have been successfully matched and accepted
           </Typography>
         </Box>
 
         {/* Messages */}
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
-
-        {/* Tabs */}
-        {matches.length > 0 && (
-          <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)} sx={{ mb: 3 }}>
-            <Tab label={`📋 Available Requests (${availableMatches.length})`} />
-            <Tab label={`👋 My Interests (${interestedMatches.length})`} />
-          </Tabs>
-        )}
 
         {/* Loading State */}
         {loading && (
@@ -297,10 +256,7 @@ const CaregiverViewMatches = () => {
           !loading && (
             <Paper sx={{ p: 4, textAlign: 'center' }}>
               <Typography color="textSecondary">
-                {activeTab === 0 ?
-                  'No available requests. Check back soon! Make sure your profile is complete for better matching.' :
-                  'No interests recorded yet.'
-                }
+                No successful matches yet.
               </Typography>
             </Paper>
           )
@@ -403,23 +359,11 @@ const CaregiverViewMatches = () => {
               </DialogContent>
               <DialogActions>
                 <Button onClick={() => setDetailsOpen(false)}>Close</Button>
-                {selectedMatch.status !== 'Interested' && (
-                  <Button
-                    onClick={() => handleShowInterest(selectedMatch)}
-                    variant="contained"
-                    sx={{ bgcolor: '#648E87' }}
-                    disabled={loading}
-                  >
-                    {loading ? 'Processing...' : 'Show Interest'}
-                  </Button>
-                )}
-                {selectedMatch.status === 'Interested' && (
-                  <Chip
-                    icon={<CheckCircleIcon />}
-                    label="Interest Shown"
-                    sx={{ bgcolor: '#e8f5e9', color: '#2e7d32' }}
-                  />
-                )}
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Successful Match"
+                  sx={{ bgcolor: '#e8f5e9', color: '#2e7d32' }}
+                />
               </DialogActions>
             </>
           )}

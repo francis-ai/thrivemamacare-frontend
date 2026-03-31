@@ -50,13 +50,24 @@ const ViewMatches = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState(0);
 
+  const parseRequestPreferences = (preferences) => {
+    if (!preferences) return {};
+    if (typeof preferences === 'object') return preferences;
+
+    try {
+      return JSON.parse(preferences);
+    } catch {
+      return {};
+    }
+  };
+
   // Fetch user requests
   useEffect(() => {
     if (!userId) return;
 
     const fetchRequests = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/users/my-requests/${userId}`);
+        const res = await axios.get(`${BASE_URL}/api/users/my-caregiver-requests/${userId}`);
         setRequests(res.data.requests || []);
         if (res.data.requests && res.data.requests.length > 0) {
           setSelectedRequest(res.data.requests[0]);
@@ -70,6 +81,8 @@ const ViewMatches = () => {
 
     fetchRequests();
   }, [userId]);
+
+  console.log(setSuccessMessage)
 
   // Fetch matches for selected request
   useEffect(() => {
@@ -271,12 +284,12 @@ const ViewMatches = () => {
                             <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <Chip
                                 icon={<StarIcon sx={{ color: 'gold' }} />}
-                                label={`${match.score} pts`}
+                                label={`${match.match_score ?? match.score ?? 0} pts`}
                                 color="primary"
                                 variant="outlined"
                                 size="small"
                               />
-                              {match.score >= 120 && (
+                              {(match.match_score ?? match.score ?? 0) >= 120 && (
                                 <Chip
                                   label="Strong Match"
                                   size="small"
@@ -336,17 +349,19 @@ const ViewMatches = () => {
                                   Preferences
                                 </Typography>
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
-                                  {selectedRequest.preferences.ethnicity !== 'Any' && (
+                                  {parseRequestPreferences(selectedRequest.preferences).ethnicity &&
+                                    parseRequestPreferences(selectedRequest.preferences).ethnicity !== 'Any' && (
                                     <Chip
                                       size="small"
-                                      label={`${selectedRequest.preferences.ethnicity}`}
+                                      label={`${parseRequestPreferences(selectedRequest.preferences).ethnicity}`}
                                       variant="outlined"
                                     />
                                   )}
-                                  {selectedRequest.preferences.religion !== 'Any' && (
+                                  {parseRequestPreferences(selectedRequest.preferences).religion &&
+                                    parseRequestPreferences(selectedRequest.preferences).religion !== 'Any' && (
                                     <Chip
                                       size="small"
-                                      label={`${selectedRequest.preferences.religion}`}
+                                      label={`${parseRequestPreferences(selectedRequest.preferences).religion}`}
                                       variant="outlined"
                                     />
                                   )}

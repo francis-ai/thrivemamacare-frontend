@@ -21,7 +21,6 @@ const RequestFormEnhanced = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   const [errors, setErrors] = useState({});
-  console.log(errors)
 
   const [requestData, setRequestData] = useState({
     service: '',
@@ -80,6 +79,7 @@ const RequestFormEnhanced = () => {
     const { name, value } = e.target;
     setPreferences((prev) => ({ ...prev, [name]: value }));
   };
+
   // ================= VALIDATION =================
   const validateStep = () => {
     let newErrors = {};
@@ -102,6 +102,10 @@ const RequestFormEnhanced = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRequestData(prev => ({ ...prev, [name]: value }));
+    // Clear error when field is filled
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleNext = () => {
@@ -122,7 +126,7 @@ const RequestFormEnhanced = () => {
     setActiveStep(prev => prev - 1);
   };
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
     setLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
@@ -203,24 +207,49 @@ const RequestFormEnhanced = () => {
   // ================= UI =================
   return (
     <DashboardLayout>
-      <Container maxWidth="lg">
-        <Box sx={{ py: 4 }}>
-
-          <Typography variant="h4" sx={{ mb: 3 }}>
+      <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+        <Box sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              mb: { xs: 2, sm: 3 },
+              fontSize: { xs: '1.75rem', sm: '2rem', md: '2.25rem' }
+            }}
+          >
             Create Care Request
           </Typography>
 
-          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-          {successMessage && <Alert severity="success">{successMessage}</Alert>}
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+              {successMessage}
+            </Alert>
+          )}
 
-          <Paper sx={{ p: 4 }}>
-            <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-              {steps.map(label => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
+          <Paper sx={{ p: { xs: 2, sm: 3, md: 4 }, borderRadius: 2 }}>
+            {/* Stepper - Responsive */}
+            <Box sx={{ mb: 4, overflowX: 'auto' }}>
+              <Stepper 
+                activeStep={activeStep} 
+                alternativeLabel
+                sx={{
+                  minWidth: { xs: 300, sm: 'auto' },
+                  '& .MuiStepLabel-label': {
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }
+                }}
+              >
+                {steps.map(label => (
+                  <Step key={label}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
 
             {/* STEP 1 */}
             {activeStep === 0 && (
@@ -229,16 +258,16 @@ const RequestFormEnhanced = () => {
                   Basic Service Details
                 </Typography>
 
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                    <FormControl fullWidth variant="outlined" required>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth variant="outlined">
                       <InputLabel>Select Services</InputLabel>
                       <Select
                         name="service"
                         value={requestData.service}
                         onChange={handleChange}
                         label="Select Services"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250 }}
                       >
                         <MenuItem value="">Select Services</MenuItem>
                         {PRIMARY_ROLES.map((role) => (
@@ -250,7 +279,7 @@ const RequestFormEnhanced = () => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} md={6}>
                     <FormControl fullWidth variant="outlined">
                       <InputLabel>Duration</InputLabel>
                       <Select
@@ -258,7 +287,7 @@ const RequestFormEnhanced = () => {
                         value={requestData.duration}
                         onChange={handleChange}
                         label="Duration"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250 }}
                       >
                         <MenuItem value="">Select Duration</MenuItem>
                         {DURATIONS.map((dur) => (
@@ -270,7 +299,7 @@ const RequestFormEnhanced = () => {
                     </FormControl>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Budget/Offer Amount (₦)"
@@ -281,7 +310,7 @@ const RequestFormEnhanced = () => {
                       placeholder="e.g., 50000 Per Month"
                       variant="outlined"
                       sx={{
-                        width: 220,
+                        width: 250,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           backgroundColor: '#fff',
@@ -301,8 +330,10 @@ const RequestFormEnhanced = () => {
                       rows={2}
                       placeholder="Your full address"
                       variant="outlined"
+                      error={!!errors.address}
+                      helperText={errors.address}
                       sx={{
-                        width: 220,
+                        width: 250,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           backgroundColor: '#fff',
@@ -323,7 +354,7 @@ const RequestFormEnhanced = () => {
                       placeholder="Any special requirements or preferences"
                       variant="outlined"
                       sx={{
-                        width: 220,
+                        width: 250,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
                           backgroundColor: '#fff',
@@ -346,16 +377,16 @@ const RequestFormEnhanced = () => {
                   These details help us find the perfect caregiver for you. All fields are required.
                 </Alert>
 
-                <Grid container spacing={3}>
+                <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
-                    <FormControl fullWidth variant="outlined" required>
+                    <FormControl fullWidth variant="outlined" required error={!!errors.primary_role}>
                       <InputLabel>Type of Care Needed *</InputLabel>
                       <Select
                         name="primary_role"
                         value={requestData.primary_role}
                         onChange={handleChange}
                         label="Type of Care Needed"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250 }}
                       >
                         <MenuItem value="">Select Role</MenuItem>
                         {PRIMARY_ROLES.map((role) => (
@@ -364,18 +395,23 @@ const RequestFormEnhanced = () => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.primary_role && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                          {errors.primary_role}
+                        </Typography>
+                      )}
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <FormControl fullWidth variant="outlined" required>
+                    <FormControl fullWidth variant="outlined" required error={!!errors.accommodation_type}>
                       <InputLabel>Accommodation Type *</InputLabel>
                       <Select
                         name="accommodation_type"
                         value={requestData.accommodation_type}
                         onChange={handleChange}
                         label="Accommodation Type"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width:220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250 }}
                       >
                         <MenuItem value="">Select Type</MenuItem>
                         {ACCOMMODATION_TYPES.map((type) => (
@@ -386,18 +422,23 @@ const RequestFormEnhanced = () => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.accommodation_type && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                          {errors.accommodation_type}
+                        </Typography>
+                      )}
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={12}>
-                    <FormControl fullWidth variant="outlined" required>
+                    <FormControl fullWidth variant="outlined" required error={!!errors.state}>
                       <InputLabel>Your State *</InputLabel>
                       <Select
                         name="state"
                         value={requestData.state}
                         onChange={handleChange}
                         label="Your State"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width:220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 220 }}
                       >
                         <MenuItem value="">Select State</MenuItem>
                         {NIGERIAN_STATES.map((state) => (
@@ -406,12 +447,17 @@ const RequestFormEnhanced = () => {
                           </MenuItem>
                         ))}
                       </Select>
+                      {errors.state && (
+                        <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                          {errors.state}
+                        </Typography>
+                      )}
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={12}>
                     <Box sx={{ 
-                      p: 2.5, 
+                      p: { xs: 2, sm: 2.5 }, 
                       backgroundColor: '#f8f9fa', 
                       borderRadius: 2,
                       border: '1px solid #e9ecef'
@@ -438,7 +484,7 @@ const RequestFormEnhanced = () => {
 
             {/* STEP 3 */}
             {activeStep === 2 && (
-             <Box>
+              <Box>
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#2c3e50' }}>
                   Caregiver Preferences
                 </Typography>
@@ -453,7 +499,7 @@ const RequestFormEnhanced = () => {
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, color: '#495057' }}>
                       Preferred Caregiver Age Range
                     </Typography>
-                    <FormGroup row>
+                    <FormGroup row sx={{ flexWrap: 'wrap', gap: { xs: 1, sm: 0 } }}>
                       {['21-30', '31-35', '36+'].map((range) => (
                         <FormControlLabel
                           key={range}
@@ -470,7 +516,7 @@ const RequestFormEnhanced = () => {
                             />
                           }
                           label={range}
-                          sx={{ mr: 3 }}
+                          sx={{ mr: { xs: 1, sm: 3 } }}
                         />
                       ))}
                     </FormGroup>
@@ -485,7 +531,7 @@ const RequestFormEnhanced = () => {
                         value={preferences.ethnicity}
                         onChange={handlePreferenceChange}
                         label="Ethnicity Preference"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width:220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250 }}
                       >
                         {ETHNICITIES.map((eth) => (
                           <MenuItem key={eth} value={eth}>
@@ -505,7 +551,7 @@ const RequestFormEnhanced = () => {
                         value={preferences.religion}
                         onChange={handlePreferenceChange}
                         label="Religion Preference"
-                        sx={{ borderRadius: 2, backgroundColor: '#fff', width:220 }}
+                        sx={{ borderRadius: 2, backgroundColor: '#fff', width: 250}}
                       >
                         {RELIGIONS.map((rel) => (
                           <MenuItem key={rel} value={rel}>
@@ -518,7 +564,7 @@ const RequestFormEnhanced = () => {
 
                   <Grid item xs={12}>
                     <Box sx={{ 
-                      p: 2.5, 
+                      p: { xs: 2, sm: 2.5 }, 
                       backgroundColor: '#f0f7f7', 
                       borderRadius: 2,
                       border: '1px solid #d4e6e2'
@@ -539,8 +585,25 @@ const RequestFormEnhanced = () => {
             )}
 
             {/* BUTTONS */}
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-              <Button onClick={handleBack} disabled={activeStep === 0}>
+            <Box sx={{ 
+              mt: 4, 
+              display: 'flex', 
+              justifyContent: 'space-between',
+              flexDirection: { xs: 'column-reverse', sm: 'row' },
+              gap: { xs: 2, sm: 0 }
+            }}>
+              <Button 
+                onClick={handleBack} 
+                disabled={activeStep === 0}
+                variant="outlined"
+                fullWidth={false}
+                sx={{ 
+                  width: { xs: '100%', sm: 'auto' },
+                  borderRadius: 2,
+                  borderColor: '#648E87',
+                  color: '#648E87'
+                }}
+              >
                 Back
               </Button>
 
@@ -549,16 +612,36 @@ const RequestFormEnhanced = () => {
                   variant="contained"
                   onClick={handleSubmit}
                   disabled={loading}
+                  fullWidth={false}
+                  sx={{ 
+                    width: { xs: '100%', sm: 'auto' },
+                    borderRadius: 2,
+                    backgroundColor: '#648E87',
+                    '&:hover': {
+                      backgroundColor: '#557870'
+                    }
+                  }}
                 >
-                  {loading ? <CircularProgress size={20} /> : 'Submit'}
+                  {loading ? <CircularProgress size={20} /> : 'Submit Request'}
                 </Button>
               ) : (
-                <Button variant="contained" onClick={handleNext}>
+                <Button 
+                  variant="contained" 
+                  onClick={handleNext}
+                  fullWidth={false}
+                  sx={{ 
+                    width: { xs: '100%', sm: 'auto' },
+                    borderRadius: 2,
+                    backgroundColor: '#648E87',
+                    '&:hover': {
+                      backgroundColor: '#557870'
+                    }
+                  }}
+                >
                   Next
                 </Button>
               )}
             </Box>
-
           </Paper>
         </Box>
       </Container>

@@ -7,7 +7,6 @@ import {
   ListItemText,
   Box,
   IconButton,
-  // Toolbar,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -15,12 +14,10 @@ import {
   WorkOutline,
   AssignmentTurnedInOutlined,
   ChecklistRtlOutlined,
-  // PeopleAltOutlined,
   NotificationsNone,
   AccountCircleOutlined,
   SupportAgentOutlined,
   RateReviewOutlined,
-  // CheckCircleOutline,
   FavoriteBorderOutlined,
 } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
@@ -40,13 +37,6 @@ const Sidebar = () => {
     { text: 'Request', icon: <AssignmentTurnedInOutlined />, path: '/dashboard/request' },
     { text: 'My Request', icon: <FavoriteBorderOutlined />, path: '/dashboard/my-requests' },
     { text: 'View Match', icon: <ChecklistRtlOutlined />, path: '/dashboard/view-matches' },
-    // { text: 'Post Job', icon: <WorkOutline />, path: '/dashboard/create-job' },
-    // { text: 'Request Helper', icon: <PeopleAltOutlined />, path: '/dashboard/request' },
-    // { text: 'My Jobs', icon: <CheckCircleOutline />, path: '/dashboard/my-jobs' },
-    // { text: 'My Requests', icon: <FavoriteBorderOutlined />, path: '/dashboard/my-requests' },
-    // { text: 'Applications', icon: <WorkOutline />, path: '/dashboard/application' },
-    // { text: 'Interested Helper', icon: <PeopleAltOutlined />, path: '/dashboard/interested-caregiver' },
-    // { text: 'Approved Helper', icon: <CheckCircleOutline />, path: '/dashboard/approved-caregiver' },
     { text: 'Reviews', icon: <RateReviewOutlined />, path: '/dashboard/review' },
     { text: 'My Account', icon: <AccountCircleOutlined />, path: '/dashboard/account' },
     { text: 'My Plan', icon: <FavoriteBorderOutlined />, path: '/dashboard/my-plan' },
