@@ -1,12 +1,14 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import {
   Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, FormControl,
-  InputLabel, Pagination, Button, Dialog, DialogTitle, DialogContent,  Chip, useMediaQuery, useTheme, Divider, DialogActions 
+  InputLabel, Pagination, Button, Dialog, DialogTitle, DialogContent, Chip, useMediaQuery, useTheme, Divider, DialogActions,
+  FormGroup, FormControlLabel, Checkbox
 } from '@mui/material';
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
 import axios from 'axios';
 import { useAuthUser } from '../../context/AuthContextUser';
 import { Snackbar, Alert } from '@mui/material';
+import { Visibility, Edit, Delete } from '@mui/icons-material';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -39,16 +41,51 @@ const MyRequests = () => {
   const [requestToDelete, setRequestToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [showSnackbar, setShowSnackbar] = useState(false);
+  
+  const [editPreferences, setEditPreferences] = useState({
+    age_range: [],
+    ethnicity: 'Any',
+    religion: 'Any'
+  });
 
+  const NIGERIAN_STATES = [
+    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
+    'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe',
+    'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara',
+    'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau',
+    'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
+  ];
 
-  // ✅ Define fetchRequests at the top level of the component
+  const ETHNICITIES = [
+    'Any',
+    'Yoruba', 'Igbo', 'Hausa', 'Fulani', 'Kanuri', 'Tiv', 'Ijaw', 'Urhobo', 'Other'
+  ];
+
+  const RELIGIONS = [
+    'Any',
+    'Christian', 'Muslim', 'Traditional', 'Other'
+  ];
+
+  const parsePreferences = (pref) => {
+    try {
+      if (!pref) return { age_range: [], ethnicity: 'Any', religion: 'Any' };
+      return typeof pref === 'string' ? JSON.parse(pref) : pref;
+    } catch {
+      return { age_range: [], ethnicity: 'Any', religion: 'Any' };
+    }
+  };
+
   const fetchRequests = useCallback(async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/users/my-caregiver-requests/${userId}`);
-      setRequests(res.data.requests);
-      setFilteredRequests(res.data.requests);
+      const requestRows = Array.isArray(res.data?.requests) ? res.data.requests : [];
+      setRequests(requestRows);
+      setFilteredRequests(requestRows);
+      console.log("Caregiver Request (API Response):", res.data.requests); 
     } catch (error) {
       console.error('Failed to fetch caregiver requests:', error);
+      setRequests([]);
+      setFilteredRequests([]);
     }
   }, [userId]);
 
@@ -61,21 +98,52 @@ const MyRequests = () => {
   // ✅ Update request
   const submitEditRequest = async () => {
     try {
+      const payload = {
+        service: editRequestData.service || editRequestData.primary_role || '',
+        duration: editRequestData.duration,
+        address: editRequestData.address,
+        notes: editRequestData.notes,
+        status: editRequestData.status,
+        offer_amount: editRequestData.offer_amount,
+
+        // 🔥 NEW FIELDS
+        primary_role: editRequestData.primary_role,
+        accommodation_type: editRequestData.accommodation_type,
+        state: editRequestData.state,
+        preferences: editPreferences
+      };
+
+      console.log("🚀 UPDATE PAYLOAD:", payload);
+
       await axios.put(
         `${BASE_URL}/api/users/update-my-caregiver-requests/${editRequestData.id}`,
-        editRequestData
+        payload
       );
+
       setEditModalOpen(false);
       setEditRequestData(null);
-      fetchRequests(); // refresh list
+      fetchRequests();
 
       setSuccessMessage('Request updated successfully!');
       setShowSnackbar(true);
     } catch (error) {
-      console.error('Error updating request:', error);
+      console.error('❌ Error updating request:', error);
     }
   };
 
+  const handleEditRequest = (request) => {
+    setEditRequestData(request);
+
+    const parsed = parsePreferences(request.preferences);
+
+    setEditPreferences({
+      age_range: parsed.age_range || [],
+      ethnicity: parsed.ethnicity || 'Any',
+      religion: parsed.religion || 'Any'
+    });
+
+    setEditModalOpen(true);
+  };
 
   // ✅ Show delete confirmation modal
   const handleDeleteRequest = (id) => {
@@ -104,8 +172,8 @@ const MyRequests = () => {
   useEffect(() => {
     const filtered = requests.filter(
       (request) =>
-        request.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        request.status.toLowerCase().includes(searchTerm.toLowerCase())
+        (request.service || request.primary_role || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (request.status || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredRequests(filtered);
     setPage(0);
@@ -121,20 +189,31 @@ const MyRequests = () => {
     setOpenModal(true);
   };
 
-  const handleEditRequest = (request) => {
-    setEditRequestData(request);
-    setEditModalOpen(true);
-  };
-
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditRequestData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditPreferenceChange = (e) => {
+    const { name, value } = e.target;
+    setEditPreferences((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditAgeRangeToggle = (range) => {
+    setEditPreferences((prev) => ({
+      ...prev,
+      age_range: prev.age_range.includes(range)
+        ? prev.age_range.filter((r) => r !== range)
+        : [...prev.age_range, range]
+    }));
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setSelectedRequest(null);
   };
+
+  const prefs = parsePreferences(selectedRequest?.preferences);
 
   return (
     <DashboardLayout>
@@ -173,7 +252,7 @@ const MyRequests = () => {
                 {!isMobile && (
                   <>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Duration</TableCell>
-                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Age Group</TableCell>
+                    <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Accomodation Type</TableCell>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Addresss</TableCell>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
                     <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Actions</TableCell>
@@ -200,7 +279,7 @@ const MyRequests = () => {
                       {!isMobile && (
                         <>
                           <TableCell>{request.duration}</TableCell>
-                          <TableCell>{request.age_group}</TableCell>
+                          <TableCell>{request.accommodation_type || '-'}</TableCell>
                           <TableCell>{request.address}</TableCell>
                           <TableCell>
                             <Chip
@@ -211,62 +290,28 @@ const MyRequests = () => {
                             />
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              color="secondary"
-                              onClick={() => handleViewDetails(request)}
-                              sx={{ mr: 1 }}
-                            >
-                              View
+                            <Button onClick={() => handleViewDetails(request)}>
+                              <Visibility color="secondary" />
                             </Button>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              color="primary"
-                              onClick={() => handleEditRequest(request)}
-                              sx={{ mr: 1 }}
-                            >
-                              Edit
+                            <Button onClick={() => handleEditRequest(request)}>
+                              <Edit color="primary" />
                             </Button>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              color="error"
-                              onClick={() => handleDeleteRequest(request.id)}
-                            >
-                              Delete
+                            <Button onClick={() => handleDeleteRequest(request.id)}>
+                              <Delete color="error" />
                             </Button>
                           </TableCell>
                         </>
                       )}
                       {isMobile && (
                         <TableCell>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                            onClick={() => handleViewDetails(request)}
-                            sx={{ mr: 1 }}
-                          >
-                            View
+                          <Button onClick={() => handleViewDetails(request)}>
+                            <Visibility color="secondary" />
                           </Button>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="primary"
-                            onClick={() => handleEditRequest(request)}
-                            sx={{ mr: 1 }}
-                          >
-                            Edit
+                          <Button onClick={() => handleEditRequest(request)}>
+                            <Edit color="primary" />
                           </Button>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="error"
-                            onClick={() => handleDeleteRequest(request.id)}
-                          >
-                            Delete
+                          <Button onClick={() => handleDeleteRequest(request.id)}>
+                            <Delete color="error" />
                           </Button>
                         </TableCell>
                       )}
@@ -279,7 +324,7 @@ const MyRequests = () => {
 
         <Box mt={2} display="flex" justifyContent="flex-end">
           <Pagination
-            count={Math.ceil(requests.length / rowsPerPage)}
+            count={Math.ceil(filteredRequests.length / rowsPerPage)}
             page={page + 1}
             onChange={(e, newPage) => handleChangePage(e, newPage - 1)}
             color="primary"
@@ -299,7 +344,10 @@ const MyRequests = () => {
                   <strong>Duration:</strong> {selectedRequest.duration}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Age Group:</strong> {selectedRequest.age_group}
+                  <strong>Accommodation:</strong> {selectedRequest.accommodation_type || '-'}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>State:</strong> {selectedRequest.state || '-'}
                 </Typography>
                 <Typography variant="body1">
                   <strong>Address:</strong> {selectedRequest.address}
@@ -313,6 +361,17 @@ const MyRequests = () => {
                 <Typography variant="body1">
                   <strong>Date:</strong> {selectedRequest.created_at}
                 </Typography>
+
+                <Typography><strong>Primary Role:</strong> {selectedRequest.primary_role}</Typography>
+                <Typography><strong>Accommodation:</strong> {selectedRequest.accommodation_type}</Typography>
+                <Typography><strong>State:</strong> {selectedRequest.state}</Typography>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="subtitle2"><strong>Preferences</strong></Typography>
+                <Typography>Age Range: {prefs.age_range?.join(', ') || 'Any'}</Typography>
+                <Typography>Ethnicity: {prefs.ethnicity}</Typography>
+                <Typography>Religion: {prefs.religion}</Typography>
                 <Typography variant="body1">
                   <strong>Status:</strong>{' '}
                   <Chip
@@ -347,13 +406,7 @@ const MyRequests = () => {
                 onChange={handleEditChange}
                 fullWidth
               />
-              <TextField
-                label="Age Group"
-                name="age_group"
-                value={editRequestData?.age_group || ''}
-                onChange={handleEditChange}
-                fullWidth
-              />
+              
               <TextField
                 label="Address"
                 name="address"
@@ -375,6 +428,7 @@ const MyRequests = () => {
                 onChange={handleEditChange}
                 fullWidth
               />
+
               <FormControl fullWidth margin="normal">
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -387,6 +441,115 @@ const MyRequests = () => {
                   <MenuItem value="Close">Close</MenuItem>
                 </Select>
               </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Primary Role</InputLabel>
+                <Select
+                  name="primary_role"
+                  value={editRequestData?.primary_role || ''}
+                  onChange={handleEditChange}
+                  sx={{ borderRadius: 2, backgroundColor: '#fff'}}
+                  label="Primary Role"
+                >
+                  <MenuItem value="Nanny">Nanny</MenuItem>
+                  <MenuItem value="Domestic Help">Domestic Help</MenuItem>
+                  <MenuItem value="Special Needs Child Caregiver">Special Needs Child Caregiver</MenuItem>
+                  <MenuItem value="Housekeeper">Housekeeper</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Accommodation Type</InputLabel>
+                <Select
+                  name="accommodation_type"
+                  value={editRequestData?.accommodation_type || ''}
+                  onChange={handleEditChange}
+                  sx={{ borderRadius: 2, backgroundColor: '#fff'}}
+                  label="Accomodation Type"
+                >
+                  <MenuItem value="Live-in">Live-in</MenuItem>
+                  <MenuItem value="Live-out">Live-out</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth variant="outlined" required>
+                <InputLabel>State </InputLabel>
+                <Select
+                  name="state"
+                  value={editRequestData?.state || ''}
+                  onChange={handleEditChange}
+                  label="Your State"
+                  sx={{ borderRadius: 2, backgroundColor: '#fff'}}
+                >
+                  <MenuItem value="">Select State</MenuItem>
+                  {NIGERIAN_STATES.map((state) => (
+                    <MenuItem key={state} value={state}>
+                      {state}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Divider sx={{ my: 1 }} />
+
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                Preferences
+              </Typography>
+
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Preferred Age Range
+                </Typography>
+                <FormGroup row>
+                  {['21-30', '31-35', '36+'].map((range) => (
+                    <FormControlLabel
+                      key={range}
+                      control={
+                        <Checkbox
+                          checked={editPreferences.age_range.includes(range)}
+                          onChange={() => handleEditAgeRangeToggle(range)}
+                        />
+                      }
+                      label={range}
+                    />
+                  ))}
+                </FormGroup>
+              </Box>
+
+              <FormControl fullWidth>
+                <InputLabel>Ethnicity Preference</InputLabel>
+                <Select
+                  name="ethnicity"
+                  value={editPreferences.ethnicity}
+                  onChange={handleEditPreferenceChange}
+                  label="Ethnicity Preference"
+                  sx={{ borderRadius: 2, backgroundColor: '#fff' }}
+                >
+                  {ETHNICITIES.map((eth) => (
+                    <MenuItem key={eth} value={eth}>
+                      {eth}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Religion Preference</InputLabel>
+                <Select
+                  name="religion"
+                  value={editPreferences.religion}
+                  onChange={handleEditPreferenceChange}
+                  label="Religion Preference"
+                  sx={{ borderRadius: 2, backgroundColor: '#fff' }}
+                >
+                  {RELIGIONS.map((rel) => (
+                    <MenuItem key={rel} value={rel}>
+                      {rel}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <Button onClick={submitEditRequest} variant="contained" color="primary">
                 Save Changes
               </Button>

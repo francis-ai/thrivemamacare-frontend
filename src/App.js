@@ -30,7 +30,6 @@ import UserDashboardLayout from './components/UserDashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Caregivers from './pages/Dashboard/Caregivers';
 import MyPlan from './pages/Dashboard/MyPlan';
-import Request from './pages/Dashboard/Request';
 import MyRequest from './pages/Dashboard/MyRequest';
 import Messages from './pages/Dashboard/Messages';
 import MyAccount from './pages/Dashboard/MyAccount';
@@ -43,6 +42,8 @@ import RequestStep2 from './pages/Dashboard/RequestStep2';
 import RequestStep3 from './pages/Dashboard/RequestStep3';
 import RequestStep4 from './pages/Dashboard/RequestStep4';
 import RequestStep5 from './pages/Dashboard/RequestStep5';
+import RequestFormEnhanced from './pages/RequestFormEnhanced';
+import UserViewMatches from './pages/Dashboard/ViewMatches';
 
 import CreateJob from './pages/Dashboard/CreateJob';
 import MyJobs from './pages/Dashboard/MyJobs';
@@ -55,12 +56,13 @@ import MyEngagement from './pages/Caregiver/MyEngagement';
 import MyMessages from './pages/Caregiver/MyMessages';
 import MyReviews from './pages/Caregiver/MyReviews';
 import CaregiverReview from './pages/Caregiver/Review';
-import Profile from './pages/Caregiver/Profile';
+import ProfileEnhanced from './pages/Caregiver/ProfileEnhanced';
 import KYC from './pages/Caregiver/kyc';
 import Notifications from './pages/Caregiver/Notifications';
 import Earnings from './pages/Caregiver/Earnings';
 import Schedule from './pages/Caregiver/Schedule';
 import CaregiverSupport from './pages/Caregiver/Support';
+import CaregiverViewMatches from './pages/Caregiver/ViewMatches';
 
 import Jobs from './pages/Caregiver/Jobs';
 import JobDetails from './pages/Caregiver/JobDetails';
@@ -119,8 +121,9 @@ function App() {
                   <Route index element={<Dashboard />} />
                   <Route path="caregivers" element={<Caregivers />} />
                   <Route path="my-plan" element={<MyPlan />} />
-                  <Route path="request" element={<Request />} />
+                  <Route path="request" element={<RequestFormEnhanced />} />
                   <Route path="my-requests" element={<MyRequest />} />
+                  <Route path="view-matches" element={<UserViewMatches />} />
                   <Route path="messages" element={<Messages />} />
                   <Route path="review" element={<Review />} />
                   <Route path="account" element={<MyAccount />} />
@@ -145,7 +148,8 @@ function App() {
                 <Route path="/caregiver/my-engagements" element={<MyEngagement />} />
                 <Route path="/caregiver/messages" element={<MyMessages />} />
                 <Route path="/caregiver/my-reviews" element={<MyReviews />} />
-                <Route path="/caregiver/profile" element={<Profile />} />
+                <Route path="/caregiver/profile" element={<ProfileEnhanced />} />
+                <Route path="/caregiver/view-matches" element={<CaregiverViewMatches />} />
                 <Route path="/caregiver/kyc" element={<KYC />} />
                  <Route path="/caregiver/review" element={<CaregiverReview/>} />
                 <Route path="/caregiver/notifications" element={<Notifications />} />

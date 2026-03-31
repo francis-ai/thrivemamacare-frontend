@@ -18,6 +18,7 @@ import {
   // PeopleAltOutlined,
   StarBorderOutlined,
   AccountCircleOutlined,
+  GroupsOutlined,
   VerifiedUserOutlined,
   // RateReviewOutlined,
   SupportAgentOutlined,
@@ -38,6 +39,7 @@ const Sidebar = () => {
 
   const navItems = [
   { text: 'Dashboard', icon: <DashboardOutlined />, path: '/caregiver/dashboard' },
+  { text: 'View All Match', icon: <GroupsOutlined />, path: '/caregiver/view-matches' },
   // { text: 'Available Jobs', icon: <WorkOutline />, path: '/caregiver/jobs' },
   // { text: 'Available Requests', icon: <HandshakeOutlined />, path: '/caregiver/available-requests' },
   // { text: 'My Applications', icon: <AssignmentTurnedInOutlined />, path: '/caregiver/my-applications' },

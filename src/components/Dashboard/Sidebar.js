@@ -13,6 +13,8 @@ import {
   Menu as MenuIcon,
   DashboardOutlined,
   WorkOutline,
+  AssignmentTurnedInOutlined,
+  ChecklistRtlOutlined,
   // PeopleAltOutlined,
   NotificationsNone,
   AccountCircleOutlined,
@@ -35,6 +37,9 @@ const Sidebar = () => {
   const navItems = [
     { text: 'Dashboard', icon: <DashboardOutlined />, path: '/dashboard' },
     { text: 'View All Helper', icon: <WorkOutline />, path: '/dashboard/caregivers' },
+    { text: 'Request', icon: <AssignmentTurnedInOutlined />, path: '/dashboard/request' },
+    { text: 'My Request', icon: <FavoriteBorderOutlined />, path: '/dashboard/my-requests' },
+    { text: 'View Match', icon: <ChecklistRtlOutlined />, path: '/dashboard/view-matches' },
     // { text: 'Post Job', icon: <WorkOutline />, path: '/dashboard/create-job' },
     // { text: 'Request Helper', icon: <PeopleAltOutlined />, path: '/dashboard/request' },
     // { text: 'My Jobs', icon: <CheckCircleOutline />, path: '/dashboard/my-jobs' },
