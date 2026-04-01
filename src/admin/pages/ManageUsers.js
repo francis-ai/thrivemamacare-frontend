@@ -22,8 +22,6 @@ import {
   Select,
   FormControl,
   InputLabel,
-  Switch,
-  FormControlLabel,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 // import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,7 +43,6 @@ const ManageUsers = () => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const [subscriptionForm, setSubscriptionForm] = useState({
-    is_premium: 0,
     current_plan: '',
     plan_expires_at: '',
   });
@@ -103,7 +100,6 @@ const ManageUsers = () => {
   const handleOpenSubscriptionForm = (user) => {
     setSelectedUser(user);
     setSubscriptionForm({
-      is_premium: user.is_premium || 0,
       current_plan: user.current_plan || '',
       plan_expires_at: user.plan_expires_at || '',
     });
@@ -195,7 +191,7 @@ const ManageUsers = () => {
                         onClick={() => handleOpenSubscriptionForm(user)}
                         sx={{ textTransform: 'none' }}
                       >
-                        {user.is_premium ? 'Premium' : 'Standard'} - {user.current_plan || '-'}
+                        {user.current_plan || 'Free Plan'}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -244,17 +240,7 @@ const ManageUsers = () => {
         <DialogContent dividers>
           {selectedUser && (
             <>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={!!subscriptionForm.is_premium}
-                    onChange={(e) => handleSubscriptionChange('is_premium', e.target.checked ? 1 : 0)}
-                    color="success"
-                  />
-                }
-                label="Premium User"
-              />
-              <Box sx={{ mt: 2 }}>
+              <Box>
                 <FormControl fullWidth>
                   <InputLabel>Current Plan</InputLabel>
                   <Select

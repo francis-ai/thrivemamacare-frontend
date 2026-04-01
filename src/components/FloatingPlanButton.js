@@ -80,17 +80,33 @@ const PulseDot = styled('div')(({ plancolor }) => ({
 export default function FloatingPlanButton() {
   const navigate = useNavigate();
   const { user } = useAuthUser();
-  const [currentPlan, setCurrentPlan] = useState('');
+  const [currentPlan, setCurrentPlan] = useState('Free Plan');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      setIsLoading(false);
+      return;
+    }
 
-    axios.get(`${BASE_URL}/api/subscriptions/user-plan/${user.id}`)
-      .then(response => {
+    const fetchPlan = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/subscriptions/user-plan/${user.id}`);
         const plan = response.data.currentPlan || 'Free Plan';
         setCurrentPlan(plan.trim());
-      })
-      .catch(() => setCurrentPlan('Free Plan'));
+      } catch (error) {
+        console.error('Error fetching user plan for floating button:', error);
+        setCurrentPlan('Free Plan');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlan();
+
+    // Refresh plan status every 60 seconds
+    const interval = setInterval(fetchPlan, 60000);
+    return () => clearInterval(interval);
   }, [user?.id]);
 
   const getPlanDetails = () => {
@@ -102,7 +118,7 @@ export default function FloatingPlanButton() {
         label: 'One-Time Access',
         tooltip: 'Premium access with one-time payment'
       };
-    } else if (planLower.includes('inclusive') || planLower.includes('all-inclusive')) {
+    } else if (planLower.includes('inclusive') || planLower.includes('all-inclusive') || planLower.includes('bundle')) {
       return {
         color: 'warning',
         label: 'All-Inclusive Bundle',
@@ -117,6 +133,11 @@ export default function FloatingPlanButton() {
     }
   };
 
+  // Don't render if still loading or no user
+  if (isLoading || !user?.id) {
+    return null;
+  }
+
   const { color, label, tooltip } = getPlanDetails();
 
   return (
@@ -126,6 +147,7 @@ export default function FloatingPlanButton() {
         plancolor={color}
         onClick={() => navigate('/subscription')}
         startIcon={<WorkspacePremiumIcon />}
+        aria-label={`Current plan: ${label}`}
       >
         {label}
         <PulseDot plancolor={color} />

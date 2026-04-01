@@ -43,9 +43,20 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <Box sx={{ width: '100%', overflowX: 'hidden' }}>
+        {(() => {
+          const currentPlan = (user?.current_plan || '').toLowerCase();
+          const hasActiveExpiry = !!(user?.plan_expires_at && new Date(user.plan_expires_at) > new Date());
+          const isPremiumPlan =
+            (currentPlan.includes('one-time') ||
+              currentPlan.includes('all-inclusive') ||
+              currentPlan.includes('bundle') ||
+              currentPlan.includes('premium')) &&
+            hasActiveExpiry;
+
+          return (
         <Typography variant="h5" gutterBottom>
           Welcome {user?.name || 'Guest'}!{' '}
-          {user?.is_premium ? (
+          {isPremiumPlan ? (
             <Chip
               icon={<Star style={{ color: '#FFD700' }} />}
               label="Premium User"
@@ -63,8 +74,17 @@ const Dashboard = () => {
             />
           )}
         </Typography>
+          );
+        })()}
 
-        {/* Contact Support */}
+
+        {/* Dashboard State */}
+        {/* <DashboardState /> */}
+        <Box sx={{ ml: -3 }}>
+          <FetchAllCaregiver />
+        </Box>
+
+         {/* Contact Support */}
         <Box sx={{ mt: 6, width: '91%' }}>
           <Card sx={{ width: '100%', overflow: 'hidden' }}>
             <CardContent>
@@ -83,33 +103,6 @@ const Dashboard = () => {
               </Button>
             </CardContent>
           </Card>
-        </Box>
-
-
-        {/* Request Caregiver Button */}
-        {/* <Box sx={{display: 'flex', gap: 3}}>
-          <Button
-            variant="contained"
-            className="request-btn"
-            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-            href="/dashboard/create-job"
-          >
-            Post Job Vacancy
-          </Button>
-          <Button
-            variant="contained"
-            className="request-btn"
-            sx={{ mt: 2, mb: 4, backgroundColor: '#648E87', textAlign: 'center' }}
-            href="/dashboard/request"
-          >
-            Request a Helper
-          </Button>
-        </Box> */}
-
-        {/* Dashboard State */}
-        {/* <DashboardState /> */}
-        <Box sx={{ ml: -3 }}>
-          <FetchAllCaregiver />
         </Box>
         
       </Box>

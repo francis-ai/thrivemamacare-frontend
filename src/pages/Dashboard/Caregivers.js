@@ -47,7 +47,14 @@ const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 export default function AllCaregiversPage() {
   const { user } = useAuthUser();
   const navigate = useNavigate();
-  const isPremium = user?.is_premium;
+  const currentPlan = (user?.current_plan || '').toLowerCase();
+  const hasActiveExpiry = !!(user?.plan_expires_at && new Date(user.plan_expires_at) > new Date());
+  const isPremium =
+    (currentPlan.includes('one-time') ||
+      currentPlan.includes('all-inclusive') ||
+      currentPlan.includes('bundle') ||
+      currentPlan.includes('premium')) &&
+    hasActiveExpiry;
 
   const [caregivers, setCaregivers] = useState([]);
   const [filteredCaregivers, setFilteredCaregivers] = useState([]);

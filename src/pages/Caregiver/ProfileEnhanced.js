@@ -358,7 +358,7 @@ const CaregiverProfileEnhanced = () => {
                       value={basicInfo.fullName}
                       onChange={handleBasicChange}
                       disabled
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -368,7 +368,7 @@ const CaregiverProfileEnhanced = () => {
                       name="email"
                       value={basicInfo.email}
                       disabled
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -378,7 +378,7 @@ const CaregiverProfileEnhanced = () => {
                       name="phone"
                       value={basicInfo.phone}
                       onChange={handleBasicChange}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -389,7 +389,7 @@ const CaregiverProfileEnhanced = () => {
                         value={basicInfo.gender}
                         onChange={handleBasicChange}
                         label="Gender"
-                        sx={{ widht: 220}}
+                        sx={{ width: 250}}
                       >
                         <MenuItem value="">Select Gender</MenuItem>
                         <MenuItem value="male">Male</MenuItem>
@@ -406,7 +406,7 @@ const CaregiverProfileEnhanced = () => {
                       onChange={handleBasicChange}
                       multiline
                       rows={2}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                 </Grid>
@@ -438,7 +438,7 @@ const CaregiverProfileEnhanced = () => {
                       value={matchingInfo.birthday}
                       onChange={handleMatchingChange}
                       InputLabelProps={{ shrink: true }}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                   
@@ -450,7 +450,7 @@ const CaregiverProfileEnhanced = () => {
                         value={matchingInfo.primary_role}
                         onChange={handleMatchingChange}
                         label="Primary Role"
-                        sx={{ widht: 220}}
+                        sx={{ width: 250}}
                       >
                         <MenuItem value="">Select Role</MenuItem>
                         {PRIMARY_ROLES.map((role) => (
@@ -470,7 +470,7 @@ const CaregiverProfileEnhanced = () => {
                         value={matchingInfo.accommodation_type}
                         onChange={handleMatchingChange}
                         label="Accommodation Type"
-                        sx={{ widht: 220}}
+                        sx={{ width: 250}}
                       >
                         <MenuItem value="">Select Type</MenuItem>
                         {ACCOMMODATION_TYPES.map((type) => (
@@ -490,6 +490,7 @@ const CaregiverProfileEnhanced = () => {
                         value={matchingInfo.state}
                         onChange={handleMatchingChange}
                         label="State"
+                        sx={{width:250}}
                       >
                         <MenuItem value="">Select State</MenuItem>
                         {NIGERIAN_STATES.map((state) => (
@@ -509,7 +510,7 @@ const CaregiverProfileEnhanced = () => {
                         value={matchingInfo.ethnicity}
                         onChange={handleMatchingChange}
                         label="Ethnicity"
-                        sx={{ widht: 220}}
+                        sx={{ width: 250}}
                       >
                         <MenuItem value="">Prefer Not to Say</MenuItem>
                         {ETHNICITIES.map((eth) => (
@@ -529,7 +530,7 @@ const CaregiverProfileEnhanced = () => {
                         value={matchingInfo.religion}
                         onChange={handleMatchingChange}
                         label="Religion"
-                        sx={{ widht: 220}}
+                        sx={{ width: 250}}
                       >
                         <MenuItem value="">Prefer Not to Say</MenuItem>
                         {RELIGIONS.map((rel) => (
@@ -550,7 +551,7 @@ const CaregiverProfileEnhanced = () => {
                       value={matchingInfo.years_of_experience}
                       onChange={handleMatchingChange}
                       inputProps={{ min: 0 }}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                     />
                   </Grid>
                 </Grid>
@@ -576,7 +577,7 @@ const CaregiverProfileEnhanced = () => {
                       onChange={handleProfessionalChange}
                       multiline
                       rows={2}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                       placeholder="e.g., Infant care, special needs support, cooking, etc."
                     />
                   </Grid>
@@ -588,7 +589,7 @@ const CaregiverProfileEnhanced = () => {
                       name="salary_range"
                       value={professionalInfo.salary_range}
                       onChange={handleProfessionalChange}
-                      sx={{ widht: 220}}
+                      sx={{ width: 250}}
                       placeholder="e.g., ₦50,000 - ₦100,000"
                     />
                   </Grid>

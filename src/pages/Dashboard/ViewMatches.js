@@ -24,19 +24,23 @@ import {
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
 import axios from 'axios';
 import { useAuthUser } from '../../context/AuthContextUser';
+import { useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarIcon from '@mui/icons-material/Star';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import LockIcon from '@mui/icons-material/Lock';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 /**
  * Caregiver Matches Display Component
  * Shows matching caregivers for a specific request
+ * Only accessible to users with "One-time access" or "All-Inclusive Bundle" subscriptions
  */
 const ViewMatches = () => {
   const { user } = useAuthUser();
+  const navigate = useNavigate();
   const userId = user?.id;
 
   const [matches, setMatches] = useState([]);
@@ -49,6 +53,9 @@ const ViewMatches = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+  const [userPlan, setUserPlan] = useState(null);
+  const [hasAccessToMatches, setHasAccessToMatches] = useState(false);
+  const [planLoading, setPlanLoading] = useState(true);
 
   const parseRequestPreferences = (preferences) => {
     if (!preferences) return {};
@@ -60,6 +67,37 @@ const ViewMatches = () => {
       return {};
     }
   };
+
+  // Check if user has access to View Matches (Only paid subscriptions: "One-time access" or "All-Inclusive Bundle")
+  useEffect(() => {
+    if (!userId) {
+      setPlanLoading(false);
+      return;
+    }
+
+    const checkSubscription = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/subscriptions/user-plan/${userId}`);
+        const currentPlan = res.data.currentPlan || 'free plan';
+        setUserPlan(res.data);
+
+        // Check if plan is a paid plan
+        const isPaidPlan =
+          currentPlan.toLowerCase().includes('one-time') ||
+          currentPlan.toLowerCase().includes('all-inclusive') ||
+          currentPlan.toLowerCase().includes('bundle');
+
+        setHasAccessToMatches(isPaidPlan);
+      } catch (err) {
+        console.error('Error fetching subscription status:', err);
+        setHasAccessToMatches(false);
+      } finally {
+        setPlanLoading(false);
+      }
+    };
+
+    checkSubscription();
+  }, [userId]);
 
   // Fetch user requests
   useEffect(() => {
@@ -81,8 +119,6 @@ const ViewMatches = () => {
 
     fetchRequests();
   }, [userId]);
-
-  console.log(setSuccessMessage)
 
   // Fetch matches for selected request
   useEffect(() => {
@@ -168,6 +204,59 @@ const ViewMatches = () => {
       </DashboardLayout>
     );
   }
+
+  // Show loading state while checking subscription
+  if (planLoading) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  // Access denied UI for users without paid subscription
+  if (!hasAccessToMatches) {
+    return (
+      <DashboardLayout>
+        <Box sx={{ p: 3 }}>
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <LockIcon />
+              <Typography variant="h6">Premium Feature</Typography>
+            </Box>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Access to View Matches is available only to users with an active subscription.
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Choose either <strong>"One-Time Access"</strong> or <strong>"All-Inclusive Bundle"</strong> to unlock this premium feature and start matching with caregivers.
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/subscription')}
+              sx={{ mt: 1 }}
+            >
+              Upgrade My Plan
+            </Button>
+          </Alert>
+
+          <Card sx={{ p: 3, textAlign: 'center' }}>
+            <LockIcon sx={{ fontSize: 60, color: '#648E87', mb: 2 }} />
+            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
+              View Matches is Locked
+            </Typography>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+              Unlock this feature to browse through matched caregivers and find the perfect helper for your needs.
+            </Typography>
+          </Card>
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  // Normal render (user has access)
 
   return (
     <DashboardLayout>

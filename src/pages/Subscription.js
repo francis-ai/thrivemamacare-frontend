@@ -21,16 +21,16 @@ import MuiAlert from '@mui/material/Alert';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from 'axios';
 import { useAuthUser } from '../context/AuthContextUser';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../assets/css/Subscription.css';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
-const PAYSTACK = process.env.PAYSTACK_PUBLIC_KEY || "pk_live_c5aeddafb04016980cb65613a8647f5ead7e8d4d";
 
 export default function Subscription() {
   const theme = useTheme();
   const { user } = useAuthUser();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [plans, setPlans] = useState([]);
   const [userPlan, setUserPlan] = useState(null);
@@ -74,73 +74,99 @@ export default function Subscription() {
     fetchPlansAndUserPlan();
   }, [user]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const reference = params.get('reference') || params.get('trxref');
+
+    if (!reference || !user?.id) {
+      return;
+    }
+
+    verifyPaymentWithBackend(reference, true);
+  }, [location.search, user?.id]);
+
   const handleSubscribe = (plan) => {
     if (!user) {
       navigate('/login', { state: { from: '/subscription' } });
       return;
     }
     setPaymentInitializing(true);
-    initializePayment(plan);
+    initializePaymentFromBackend(plan);
   };
 
-  const initializePayment = (plan) => {
-    const handler = window.PaystackPop.setup({
-      key: PAYSTACK,
-      email: user.email,
-      amount: Number(plan.price) * 100,
-      currency: 'NGN',
-      ref: '' + Math.floor(Math.random() * 1000000000 + 1),
-      metadata: {
+  // Initialize payment via backend (Paystack integration from backend)
+  const initializePaymentFromBackend = async (plan) => {
+    try {
+      // Call backend to initialize Paystack payment
+      const response = await axios.post(`${BASE_URL}/api/subscriptions/initialize`, {
         userId: user.id,
-        plan: plan.plan_name
-      },
-      callback: function (response) {
-        fetch(`${BASE_URL}/api/subscriptions/verify`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reference: response.reference }),
-        })
-          .then((res) => res.json())
-          .then(async (data) => {
-            setPaymentInitializing(false);
-            setSnackbar({
-              open: true,
-              message: data.message || 'Payment verified successfully.',
-              severity: 'success',
-            });
+        planId: plan.id,
+        email: user.email
+      });
 
-            // Refresh user plan
-            try {
-              const res = await axios.get(`${BASE_URL}/api/subscriptions/user-plan/${user.id}`);
-              setUserPlan(res.data);
-            } catch (err) {
-              console.error("Error refreshing user plan:", err);
-            }
+      if (response.data.status) {
+        const { authorization_url } = response.data.data;
 
-            // Redirect to dashboard after 4 seconds
-            setTimeout(() => navigate('/dashboard'), 4000);
-          })
-          .catch((err) => {
-            console.error('Verification failed:', err);
-            setPaymentInitializing(false);
-            setSnackbar({
-              open: true,
-              message: 'Payment was successful but failed to verify with server.',
-              severity: 'error',
-            });
-          });
-      },
-      onClose: function () {
-        setPaymentInitializing(false);
-        setSnackbar({
-          open: true,
-          message: 'Transaction was not completed.',
-          severity: 'warning',
-        });
-      },
-    });
+        if (!authorization_url) {
+          throw new Error('No authorization URL returned from backend');
+        }
 
-    handler.openIframe();
+        window.location.href = authorization_url;
+      } else {
+        throw new Error(response.data.message || 'Failed to initialize payment');
+      }
+    } catch (err) {
+      console.error('Payment initialization error:', err);
+      setPaymentInitializing(false);
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.message || 'Failed to initialize payment. Please try again.',
+        severity: 'error',
+      });
+    }
+  };
+
+  // Verify payment with backend
+  const verifyPaymentWithBackend = async (reference, clearQuery = false) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/api/subscriptions/verify`, {
+        reference
+      });
+
+      setPaymentInitializing(false);
+      setSnackbar({
+        open: true,
+        message: response.data.message || 'Payment verified successfully.',
+        severity: 'success',
+      });
+
+      // Refresh user plan
+      try {
+        const res = await axios.get(`${BASE_URL}/api/subscriptions/user-plan/${user.id}`);
+        setUserPlan(res.data);
+      } catch (err) {
+        console.error("Error refreshing user plan:", err);
+      }
+
+      if (clearQuery) {
+        navigate('/subscription', { replace: true });
+      }
+
+      // Redirect to dashboard after 3 seconds
+      setTimeout(() => navigate('/dashboard'), 3000);
+    } catch (err) {
+      console.error('Verification error:', err);
+      setPaymentInitializing(false);
+      setSnackbar({
+        open: true,
+        message: err.response?.data?.message || 'Payment verification failed.',
+        severity: 'error',
+      });
+
+      if (clearQuery) {
+        navigate('/subscription', { replace: true });
+      }
+    }
   };
 
   if (loading) {

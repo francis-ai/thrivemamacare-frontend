@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 import { useAuthUser } from "../../context/AuthContextUser";
 import {
@@ -29,8 +30,10 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function MyPlan() {
   const { user } = useAuthUser();
+  const navigate = useNavigate();
 
   const [plan, setPlan] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -42,11 +45,24 @@ export default function MyPlan() {
         setLoading(true);
         setError("");
 
-        const res = await axios.get(
-          `${BASE_URL}/api/users/my-plan/${user.id}`
+        // Fetch user subscription plan
+        const planRes = await axios.get(
+          `${BASE_URL}/api/subscriptions/user-plan/${user.id}`
         );
 
-        setPlan(res.data.plan);
+        setCurrentPlan(planRes.data);
+
+        // Only fetch plan details if user has an active paid subscription
+        if (planRes.data.currentPlan && planRes.data.currentPlan.toLowerCase() !== 'free plan') {
+          // Fetch plan details from subscription plans
+          const plansRes = await axios.get(`${BASE_URL}/api/subscriptions/plans`);
+          const userPlanDetails = plansRes.data.find(
+            (p) => p.plan_name.toLowerCase() === planRes.data.currentPlan.toLowerCase()
+          );
+          if (userPlanDetails) {
+            setPlan(userPlanDetails);
+          }
+        }
       } catch (err) {
         console.error(err);
         setError("Failed to fetch your plan.");
@@ -147,29 +163,36 @@ export default function MyPlan() {
           >
             <div className="flex flex-col items-center max-w-md mx-auto">
               <Avatar className="w-16 h-16 sm:w-20 sm:h-20 bg-[#648E87]/10 mb-4">
-                <Cancel className="text-[#648E87] text-3xl sm:text-4xl" />
+                <WorkspacePremium className="text-[#648E87] text-3xl sm:text-4xl" />
               </Avatar>
               <Typography 
                 variant="h6" 
                 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2"
               >
-                No Active Subscription
+                You're on the Free Plan
               </Typography>
               <Typography 
                 variant="body2" 
                 className="text-sm sm:text-base text-gray-600 mb-6"
               >
-                You don't have an active subscription plan at the moment. 
-                Choose a plan that best fits your needs.
+                Upgrade to unlock premium features including unlimited caregiver access and priority support.
               </Typography>
               <Button 
                 variant="contained" 
-                className="w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3 text-sm sm:text-base bg-[#648E87] hover:bg-[#4F726C]"
+                className="w-full sm:w-auto px-8 py-3 text-base bg-[#648E87] hover:bg-[#4F726C]"
                 size="large"
-                href="/plans"
+                onClick={() => navigate('/subscription')}
               >
-                Browse Available Plans
+                Upgrade to Premium
               </Button>
+              {currentPlan?.daysRemaining !== null && (
+                <Typography 
+                  variant="caption" 
+                  className="text-xs sm:text-sm text-gray-500 mt-4 block"
+                >
+                  Free plans have limited access to matches. Upgrade to view all available caregivers.
+                </Typography>
+              )}
             </div>
           </Paper>
         )}
@@ -182,12 +205,12 @@ export default function MyPlan() {
               {/* Card Header with Gradient - Using Primary Color #648E87 */}
               <div className="bg-gradient-to-r from-[#648E87] to-[#4F726C] px-4 sm:px-6 py-4 sm:py-5">
                 <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-3">
-                  <div>
+                  <div className="flex-1">
                     <Typography 
                       variant="h5" 
                       className="text-lg sm:text-xl md:text-2xl font-bold text-white break-words"
                     >
-                      {plan.plan_name}
+                      {plan?.plan_name}
                     </Typography>
                     <div className="flex items-center gap-2 mt-1">
                       <Label className="text-white/80 text-sm" />
@@ -195,20 +218,58 @@ export default function MyPlan() {
                         variant="caption" 
                         className="text-white/80 text-xs sm:text-sm"
                       >
-                        ID: {plan.plan_slug}
+                        ID: {plan?.plan_slug}
                       </Typography>
                     </div>
                   </div>
-                  <Chip 
-                    label="Active" 
-                    size="small"
-                    icon={<CheckCircle />}
-                    className="self-start xs:self-center bg-[#dd700a] text-white font-medium"
-                  />
+                  <div className="flex flex-col xs:flex-row xs:items-center gap-2 self-start xs:self-center">
+                    <Chip 
+                      label="Active" 
+                      size="small"
+                      icon={<CheckCircle />}
+                      className="bg-[#dd700a] text-white font-medium"
+                    />
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => navigate('/subscription')}
+                      sx={{ 
+                        color: 'white', 
+                        borderColor: 'white',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255,255,255,0.1)',
+                          borderColor: 'white'
+                        }
+                      }}
+                    >
+                      Renew Plan
+                    </Button>
+                  </div>
                 </div>
               </div>
 
               <CardContent className="p-4 sm:p-6 md:p-8">
+                {/* Plan Expiry Alert */}
+                {currentPlan?.expiresAt && (
+                  <Alert 
+                    severity={currentPlan.daysRemaining <= 7 ? 'warning' : 'info'}
+                    className="mb-6"
+                    icon={<Info />}
+                  >
+                    <Typography variant="body2" className="font-medium">
+                      {currentPlan.daysRemaining <= 0 
+                        ? '⚠️ Your subscription has expired. Renew to continue accessing premium features.'
+                        : currentPlan.daysRemaining <= 7
+                        ? `⏰ Your plan expires in ${currentPlan.daysRemaining} day${currentPlan.daysRemaining !== 1 ? 's' : ''}. Renew now to avoid interruptions.`
+                        : `✓ Your plan is active and expires in ${currentPlan.daysRemaining} days.`
+                      }
+                    </Typography>
+                    <Typography variant="caption" className="text-xs block mt-1">
+                      Expiry Date: {new Date(currentPlan.expiresAt).toLocaleDateString()}
+                    </Typography>
+                  </Alert>
+                )}
+
                 {/* Key Metrics Grid - Responsive */}
                 <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
                   {/* Price Card */}
