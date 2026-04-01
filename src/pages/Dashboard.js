@@ -5,21 +5,21 @@ import { Box, Typography, Button, Card, CardContent, Dialog, DialogTitle, Dialog
 import { HelpOutline, Star, Verified } from '@mui/icons-material';
 import FetchAllCaregiver from '../components/Dashboard/FetchCaregivers';
 import axios from 'axios';
+import { useAuthUser } from '../context/AuthContextUser';
+import useUserPlan from '../hooks/useUserPlan';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useAuthUser();
+  const { isPremium } = useUserPlan();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('user'));
-    setUser(stored);
-
-    if (stored && !stored.has_seen_safety_popup) {
+    if (user && !user.has_seen_safety_popup) {
       setOpen(true);
     }
-  }, []);
+  }, [user]);
 
   const handleClose = async () => {
     setOpen(false);
@@ -30,30 +30,21 @@ const Dashboard = () => {
           type: user.type,
         });
 
-        // ✅ Update local storage so popup doesn’t keep showing
+        // Update auth context and local storage so popup doesn’t keep showing
         const updated = { ...user, has_seen_safety_popup: 1 };
-        localStorage.setItem('user', JSON.stringify(updated));
-        setUser(updated);
+        try { localStorage.setItem('user', JSON.stringify(updated)); } catch (e) {}
+        if (setUser) setUser(updated);
       }
     } catch (err) {
       console.error('Failed to update popup status:', err);
     }
   };
 
+  const isPremiumPlan = !!isPremium;
+
   return (
     <DashboardLayout>
       <Box sx={{ width: '100%', overflowX: 'hidden' }}>
-        {(() => {
-          const currentPlan = (user?.current_plan || '').toLowerCase();
-          const hasActiveExpiry = !!(user?.plan_expires_at && new Date(user.plan_expires_at) > new Date());
-          const isPremiumPlan =
-            (currentPlan.includes('one-time') ||
-              currentPlan.includes('all-inclusive') ||
-              currentPlan.includes('bundle') ||
-              currentPlan.includes('premium')) &&
-            hasActiveExpiry;
-
-          return (
         <Typography variant="h5" gutterBottom>
           Welcome {user?.name || 'Guest'}!{' '}
           {isPremiumPlan ? (
@@ -74,9 +65,6 @@ const Dashboard = () => {
             />
           )}
         </Typography>
-          );
-        })()}
-
 
         {/* Dashboard State */}
         {/* <DashboardState /> */}

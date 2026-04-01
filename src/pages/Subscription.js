@@ -28,7 +28,7 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function Subscription() {
   const theme = useTheme();
-  const { user } = useAuthUser();
+  const { user, setUser } = useAuthUser();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -140,10 +140,23 @@ export default function Subscription() {
         severity: 'success',
       });
 
-      // Refresh user plan
+      // Refresh user plan and update auth state/localStorage so dashboard reflects new plan
       try {
         const res = await axios.get(`${BASE_URL}/api/subscriptions/user-plan/${user.id}`);
         setUserPlan(res.data);
+
+        // Update global auth user and localStorage with normalized keys used by Dashboard
+        try {
+          const updatedUser = {
+            ...(user || {}),
+            current_plan: res.data.currentPlan,
+            plan_expires_at: res.data.expiresAt,
+          };
+          if (setUser) setUser(updatedUser);
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        } catch (e) {
+          console.error('Failed to update stored user plan:', e);
+        }
       } catch (err) {
         console.error("Error refreshing user plan:", err);
       }

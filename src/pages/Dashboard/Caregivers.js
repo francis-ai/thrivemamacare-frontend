@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 import { useAuthUser } from "../../context/AuthContextUser";
+import useUserPlan from '../../hooks/useUserPlan';
 import { 
   Snackbar, 
   Alert, 
@@ -46,15 +47,8 @@ const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
 export default function AllCaregiversPage() {
   const { user } = useAuthUser();
+  const { isPremium } = useUserPlan();
   const navigate = useNavigate();
-  const currentPlan = (user?.current_plan || '').toLowerCase();
-  const hasActiveExpiry = !!(user?.plan_expires_at && new Date(user.plan_expires_at) > new Date());
-  const isPremium =
-    (currentPlan.includes('one-time') ||
-      currentPlan.includes('all-inclusive') ||
-      currentPlan.includes('bundle') ||
-      currentPlan.includes('premium')) &&
-    hasActiveExpiry;
 
   const [caregivers, setCaregivers] = useState([]);
   const [filteredCaregivers, setFilteredCaregivers] = useState([]);

@@ -68,6 +68,8 @@ const ViewMatches = () => {
     }
   };
 
+  console.log("User Plan", userPlan?.currentPlan)
+
   // Check if user has access to View Matches (Only paid subscriptions: "One-time access" or "All-Inclusive Bundle")
   useEffect(() => {
     if (!userId) {
