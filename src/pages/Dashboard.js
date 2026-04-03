@@ -68,7 +68,7 @@ const Dashboard = () => {
 
         {/* Dashboard State */}
         {/* <DashboardState /> */}
-        <Box sx={{ ml: -3 }}>
+        <Box>
           <FetchAllCaregiver />
         </Box>
 
