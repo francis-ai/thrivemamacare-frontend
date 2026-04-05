@@ -24,7 +24,7 @@ import {
 import DashboardLayout from '../../components/Dashboard/DashboardLayout';
 import axios from 'axios';
 import { useAuthUser } from '../../context/AuthContextUser';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import StarIcon from '@mui/icons-material/Star';
@@ -41,7 +41,12 @@ const BASE_URL = process.env.REACT_APP_BASE_URL;
 const ViewMatches = () => {
   const { user } = useAuthUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const userId = user?.id;
+
+  const queryParams = new URLSearchParams(location.search);
+  const emailRequestId = Number(queryParams.get('requestId')) || null;
+  const emailMatchId = Number(queryParams.get('matchId')) || null;
 
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +58,7 @@ const ViewMatches = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState(0);
+  const [openedMatchFromEmail, setOpenedMatchFromEmail] = useState(false);
   const [userPlan, setUserPlan] = useState(null);
   const [hasAccessToMatches, setHasAccessToMatches] = useState(false);
   const [planLoading, setPlanLoading] = useState(true);
@@ -110,8 +116,13 @@ const ViewMatches = () => {
         const res = await axios.get(`${BASE_URL}/api/users/my-caregiver-requests/${userId}`);
         setRequests(res.data.requests || []);
         if (res.data.requests && res.data.requests.length > 0) {
-          setSelectedRequest(res.data.requests[0]);
-          setRequestId(res.data.requests[0].id);
+          const fromEmailRequest = emailRequestId
+            ? res.data.requests.find((req) => req.id === emailRequestId)
+            : null;
+
+          const initialRequest = fromEmailRequest || res.data.requests[0];
+          setSelectedRequest(initialRequest);
+          setRequestId(initialRequest.id);
         }
       } catch (err) {
         console.error('Error fetching requests:', err);
@@ -120,7 +131,7 @@ const ViewMatches = () => {
     };
 
     fetchRequests();
-  }, [userId]);
+  }, [userId, emailRequestId]);
 
   // Fetch matches for selected request
   useEffect(() => {
@@ -152,6 +163,19 @@ const ViewMatches = () => {
 
     fetchMatches();
   }, [userId, requestId]);
+
+  useEffect(() => {
+    if (!emailMatchId || openedMatchFromEmail || matches.length === 0) {
+      return;
+    }
+
+    const linkedMatch = matches.find((match) => match.id === emailMatchId);
+    if (linkedMatch) {
+      setSelectedMatch(linkedMatch);
+      setDetailsOpen(true);
+      setOpenedMatchFromEmail(true);
+    }
+  }, [emailMatchId, openedMatchFromEmail, matches]);
 
   const handleRequestChange = (request) => {
     setSelectedRequest(request);
@@ -276,6 +300,11 @@ const ViewMatches = () => {
         {/* Messages */}
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
+        {emailRequestId && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            You opened this page from a match recommendation email. Review the match and choose to approve or reject.
+          </Alert>
+        )}
 
         {/* Request Selector */}
         {requests.length > 0 && (

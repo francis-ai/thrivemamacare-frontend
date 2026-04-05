@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 import { useAuthUser } from "../../context/AuthContextUser";
@@ -45,6 +45,33 @@ import { useNavigate } from "react-router-dom";
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
+const PRIMARY_ROLES = [
+  "Domestic Help",
+  "Nanny",
+  "Special Needs Child Caregiver",
+  "Housekeeper",
+];
+
+const ACCOMMODATION_TYPES = ["Live-in", "Live-out"];
+
+const NIGERIAN_STATES = [
+  "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
+  "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe",
+  "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara",
+  "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau",
+  "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara",
+];
+
+const ETHNICITIES = [
+  "Any",
+  "Yoruba", "Igbo", "Hausa", "Fulani", "Kanuri", "Tiv", "Ijaw", "Urhobo", "Other",
+];
+
+const RELIGIONS = [
+  "Any",
+  "Christian", "Muslim", "Traditional", "Other",
+];
+
 export default function AllCaregiversPage() {
   const { user } = useAuthUser();
   const { isPremium } = useUserPlan();
@@ -72,14 +99,12 @@ export default function AllCaregiversPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
-    speciality: "",
-    gender: "",
-    status: "",
-    minSalary: "",
-    maxSalary: "",
+    service: "",
+    accommodation: "",
+    state: "",
+    ethnicityPreference: "",
+    religiousPreference: "",
   });
-  
-  const [salaryRange, setSalaryRange] = useState([0, 1000000]);
 
   const perPage = 8;
 
@@ -112,36 +137,52 @@ export default function AllCaregiversPage() {
       filtered = filtered.filter(cg => 
         cg.name?.toLowerCase().includes(term) ||
         cg.email?.toLowerCase().includes(term) ||
-        cg.speciality?.toLowerCase().includes(term) ||
+        (cg.primary_role || cg.speciality)?.toLowerCase().includes(term) ||
         cg.phone?.includes(term)
       );
     }
 
-    // Speciality filter
-    if (filters.speciality) {
+    // Service filter
+    if (filters.service) {
       filtered = filtered.filter(cg => 
-        cg.speciality?.toLowerCase() === filters.speciality.toLowerCase()
+        (cg.primary_role || cg.speciality)?.toLowerCase() === filters.service.toLowerCase()
       );
     }
 
-    // Gender filter
-    if (filters.gender) {
-      filtered = filtered.filter(cg => cg.gender === filters.gender);
+    // Accommodation filter
+    if (filters.accommodation) {
+      filtered = filtered.filter(cg => 
+        cg.accommodation_type?.toLowerCase() === filters.accommodation.toLowerCase()
+      );
     }
 
-    // Status filter
-    if (filters.status) {
-      filtered = filtered.filter(cg => cg.status === filters.status);
+    // State filter
+    if (filters.state) {
+      filtered = filtered.filter(cg => 
+        cg.state?.toLowerCase() === filters.state.toLowerCase()
+      );
     }
 
-    // Salary range filter
-    filtered = filtered.filter(cg => {
-      const salary = parseFloat(cg.salary_range) || 0;
-      return salary >= salaryRange[0] && salary <= salaryRange[1];
-    });
+    // Ethnicity preference filter
+    if (filters.ethnicityPreference && filters.ethnicityPreference !== "Any") {
+      filtered = filtered.filter(cg => 
+        cg.ethnicity?.toLowerCase() === filters.ethnicityPreference.toLowerCase()
+      );
+    }
+
+    // Religious preference filter
+    if (filters.religiousPreference && filters.religiousPreference !== "Any") {
+      filtered = filtered.filter(cg => 
+        cg.religion?.toLowerCase() === filters.religiousPreference.toLowerCase()
+      );
+    }
 
     setFilteredCaregivers(filtered);
-  }, [searchTerm, filters, salaryRange, caregivers]);
+  }, [searchTerm, filters, caregivers]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
 
   const getDisplayedCaregivers = () => {
     if (!isPremium) return filteredCaregivers.slice(0, 4);
@@ -206,22 +247,16 @@ export default function AllCaregiversPage() {
     }
   };
 
-  // Get unique specialities for filter
-  const uniqueSpecialities = useMemo(() => {
-    return [...new Set(caregivers.map(cg => cg.speciality).filter(Boolean))];
-  }, [caregivers]);
-
   // Reset filters
   const resetFilters = () => {
     setSearchTerm("");
     setFilters({
-      speciality: "",
-      gender: "",
-      status: "",
-      minSalary: "",
-      maxSalary: "",
+      service: "",
+      accommodation: "",
+      state: "",
+      ethnicityPreference: "",
+      religiousPreference: "",
     });
-    setSalaryRange([0, 1000000]);
   };
 
   if (loading) {
@@ -265,7 +300,8 @@ export default function AllCaregiversPage() {
             <Chip
               icon={<Star style={{ color: '#FFD700' }} />}
               label="Premium Access"
-              className="bg-[#648E87] text-white font-semibold px-4 py-1 self-start sm:self-auto"
+              color="success"
+              className="text-white font-semibold px-4 py-1 self-start sm:self-auto"
             />
           )}
         </div>
@@ -275,7 +311,7 @@ export default function AllCaregiversPage() {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder="Search by name, email, speciality..."
+            placeholder="Search by name, email, service..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
@@ -313,73 +349,81 @@ export default function AllCaregiversPage() {
               </Button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Speciality Filter */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Service Filter */}
               <FormControl size="small" fullWidth>
-                <InputLabel>Speciality</InputLabel>
+                <InputLabel>Select Service</InputLabel>
                 <Select
-                  value={filters.speciality}
-                  label="Speciality"
-                  onChange={(e) => setFilters({...filters, speciality: e.target.value})}
+                  value={filters.service}
+                  label="Select Service"
+                  onChange={(e) => setFilters({...filters, service: e.target.value})}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {uniqueSpecialities.map(spec => (
-                    <MenuItem key={spec} value={spec}>{spec}</MenuItem>
+                  {PRIMARY_ROLES.map(service => (
+                    <MenuItem key={service} value={service}>{service}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
 
-              {/* Gender Filter */}
+              {/* Accommodation Filter */}
               <FormControl size="small" fullWidth>
-                <InputLabel>Gender</InputLabel>
+                <InputLabel>Select Accommodation</InputLabel>
                 <Select
-                  value={filters.gender}
-                  label="Gender"
-                  onChange={(e) => setFilters({...filters, gender: e.target.value})}
+                  value={filters.accommodation}
+                  label="Select Accommodation"
+                  onChange={(e) => setFilters({...filters, accommodation: e.target.value})}
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
+                  {ACCOMMODATION_TYPES.map(accommodation => (
+                    <MenuItem key={accommodation} value={accommodation}>{accommodation}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
-              {/* Status Filter */}
+              {/* State Filter */}
               <FormControl size="small" fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel>State</InputLabel>
                 <Select
-                  value={filters.status}
-                  label="Status"
-                  onChange={(e) => setFilters({...filters, status: e.target.value})}
+                  value={filters.state}
+                  label="State"
+                  onChange={(e) => setFilters({...filters, state: e.target.value})}
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="verified">Verified</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
+                  {NIGERIAN_STATES.map(state => (
+                    <MenuItem key={state} value={state}>{state}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 
-              {/* Salary Range Filter */}
-              <div className="col-span-full lg:col-span-1">
-                <Typography gutterBottom className="text-sm text-gray-600">
-                  Salary Range (₦)
-                </Typography>
-                <div className="flex items-center gap-2">
-                  <TextField
-                    size="small"
-                    placeholder="Min"
-                    value={filters.minSalary}
-                    onChange={(e) => setFilters({...filters, minSalary: e.target.value})}
-                    className="w-full"
-                  />
-                  <span>-</span>
-                  <TextField
-                    size="small"
-                    placeholder="Max"
-                    value={filters.maxSalary}
-                    onChange={(e) => setFilters({...filters, maxSalary: e.target.value})}
-                    className="w-full"
-                  />
-                </div>
-              </div>
+              {/* Ethnicity Preference Filter */}
+              <FormControl size="small" fullWidth>
+                <InputLabel>Ethnicity Preference</InputLabel>
+                <Select
+                  value={filters.ethnicityPreference}
+                  label="Ethnicity Preference"
+                  onChange={(e) => setFilters({...filters, ethnicityPreference: e.target.value})}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {ETHNICITIES.map(ethnicity => (
+                    <MenuItem key={ethnicity} value={ethnicity}>{ethnicity}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Religious Preference Filter */}
+              <FormControl size="small" fullWidth>
+                <InputLabel>Religious Preference</InputLabel>
+                <Select
+                  value={filters.religiousPreference}
+                  label="Religious Preference"
+                  onChange={(e) => setFilters({...filters, religiousPreference: e.target.value})}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  {RELIGIONS.map(religion => (
+                    <MenuItem key={religion} value={religion}>{religion}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
           </div>
         )}
